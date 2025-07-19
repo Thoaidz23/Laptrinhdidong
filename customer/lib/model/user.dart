@@ -17,7 +17,7 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: int.parse(json['id'].toString()),
+      id: int.parse(json['id_user'].toString()),
       name: json['name'],
       email: json['email'],
       phone: json['phone'] ?? '',
@@ -25,3 +25,4 @@ class User {
     );
   }
 }
+User? currentUser;

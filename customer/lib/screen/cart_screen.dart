@@ -1,65 +1,84 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../provider/cart_provider.dart';
+import '../services/api_service.dart';
+import '../model/cart_item.dart';
+import '../model/user.dart';
 
-class CartScreen extends StatelessWidget {
-  const CartScreen({super.key});
+class CartScreen extends StatefulWidget {
+  final User currentUser;
+
+  const CartScreen({super.key, required this.currentUser});
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  List<CartItem> _cartItems = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCart();
+  }
+
+  Future<void> _loadCart() async {
+    try {
+      final items = await ApiService.getCart(widget.currentUser.id); // ✅ dùng đúng hàm
+      setState(() {
+        _cartItems = items;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print("Failed to load cart: $e");
+    }
+  }
+
+  Future<void> _removeItem(int productId) async {
+    await ApiService.deleteCartItem(widget.currentUser.id, productId);
+    _loadCart();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final cart = Provider.of<CartProvider>(context);
+    double total = _cartItems.fold(0, (sum, item) => sum + (item.price * item.quantity));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Giỏ hàng'),
+        title: const Text("Giỏ hàng"),
       ),
-      body: cart.items.isEmpty
-          ? const Center(child: Text('Giỏ hàng trống'))
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _cartItems.isEmpty
+          ? const Center(child: Text("Giỏ hàng trống."))
           : Column(
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: cart.items.length,
+              itemCount: _cartItems.length,
               itemBuilder: (context, index) {
-                final item = cart.items[index];
+                final item = _cartItems[index];
                 return ListTile(
-                  leading: Image.network(item.product.imageUrl, width: 60, height: 60, fit: BoxFit.cover),
-                  title: Text(item.product.name),
-                  subtitle: Text('Số lượng: ${item.quantity}'),
-                  trailing: Text('${(item.product.price * item.quantity).toStringAsFixed(0)} đ'),
-                  onLongPress: () => cart.removeFromCart(item.product),
+                  title: Text("Món ${item.idProduct}"),
+                  subtitle: Text("SL: ${item.quantity} | Giá: ${item.price}đ"),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => _removeItem(item.idProduct),
+                  ),
                 );
               },
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Tổng:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    Text('${cart.totalPrice.toStringAsFixed(0)} đ', style: const TextStyle(fontSize: 20, color: Colors.orange)),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // TODO: gọi API đặt hàng
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Đã đặt hàng (giả lập)')));
-                      cart.clearCart();
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                    child: const Text('Đặt hàng'),
-                  ),
-                ),
+                const Text("Tổng cộng:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text("${total.toStringAsFixed(0)}đ", style: const TextStyle(fontSize: 18)),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

@@ -1,19 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class CategorySection extends StatelessWidget {
+class CategorySection extends StatefulWidget {
   const CategorySection({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final categories = [
-      {'name': 'Mì', 'icon': Icons.ramen_dining},
-      {'name': 'Cơm', 'icon': Icons.rice_bowl},
-      {'name': 'Trà sữa', 'icon': Icons.emoji_food_beverage},
-      {'name': 'Gà rán', 'icon': Icons.set_meal},
-      {'name': 'Pizza', 'icon': Icons.local_pizza},
-      {'name': 'Đồ ăn nhanh', 'icon': Icons.fastfood},
-    ];
+  State<CategorySection> createState() => _CategorySectionState();
+}
 
+class _CategorySectionState extends State<CategorySection> {
+  List<dynamic> categories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCategories();
+  }
+
+  Future<void> fetchCategories() async {
+    final response = await http.get(Uri.parse('http://10.0.2.2/ttsfood/api/get_categories.php'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        categories = data;
+      });
+    } else {
+      print('Lỗi tải danh mục: ${response.statusCode}');
+    }
+  }
+
+  IconData getIconData(String iconName) {
+    switch (iconName) {
+      case 'fastfood':
+        return Icons.fastfood;
+      case 'cake':
+        return Icons.cake;
+      case 'candy':
+        return Icons.coronavirus_outlined;
+      case 'emoji_food_beverage':
+        return Icons.emoji_food_beverage;
+      case 'lunch_dining':
+        return Icons.lunch_dining;
+      case 'ramen_dining':
+        return Icons.ramen_dining;
+      default:
+        return Icons.category;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
@@ -30,11 +68,15 @@ class CategorySection extends StatelessWidget {
           const SizedBox(height: 10),
           SizedBox(
             height: 90,
-            child: ListView.builder(
+            child: categories.isEmpty
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 final category = categories[index];
+                final icon = getIconData(category['icon_name'] ?? '');
+
                 return Container(
                   width: 80,
                   margin: const EdgeInsets.only(right: 12),
@@ -42,17 +84,22 @@ class CategorySection extends StatelessWidget {
                     color: Colors.orange.shade50,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(category['icon'] as IconData, color: Colors.orange, size: 30),
-                      const SizedBox(height: 6),
-                      Text(
-                        category['name'] as String,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                    ],
+                  child: InkWell(
+                    onTap: () {
+                      // TODO: xử lý khi chọn danh mục
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(icon, color: Colors.orange, size: 30),
+                        const SizedBox(height: 6),
+                        Text(
+                          category['name'],
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 13),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },

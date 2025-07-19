@@ -4,7 +4,7 @@ header('Access-Control-Allow-Origin: *');
 
 include_once 'db.php'; // đường dẫn tới db.php
 
-$sql = "SELECT * FROM products";
+$sql = "SELECT * FROM tbl_product";
 $result = $conn->query($sql);
 
 $products = [];

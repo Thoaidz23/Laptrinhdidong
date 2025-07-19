@@ -4,9 +4,25 @@ import 'package:http/http.dart' as http;
 import '../model/product.dart';
 import '../model/order.dart';
 import '../model/user.dart';
+import '../model/cart_item.dart';
 
 class ApiService {
-  static const String baseUrl = "http://192.168.211.1/ttsfood/api"; // localhost for Android emulator
+  static String baseUrl = "http://10.0.2.2/ttsfood/api"; // localhost for Android emulator
+
+  // Gọi cái này khi app khởi động
+  static Future<void> fetchBaseUrl() async {
+    try {
+      final response = await http.get(Uri.parse("http://10.0.2.2/ttsfood/api/get_ip.php"));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        String ip = data['ip'];
+        baseUrl = "http://$ip/ttsfood/api";
+        print(">>> New baseUrl: $baseUrl");
+      }
+    } catch (e) {
+      print(">>> Failed to fetch IP, using default: $e");
+    }
+  }
 
   static Future<List<Product>> fetchProducts() async {
     final response = await http.get(Uri.parse("$baseUrl/get_products.php"));
@@ -28,36 +44,41 @@ class ApiService {
 
   static Future<User?> login(String email, String password) async {
     final response = await http.post(
-      Uri.parse("$baseUrl/login.php"),
-      body: {'email': email, 'password': password},
+      Uri.parse('$baseUrl/login.php'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'password': password}),
     );
-    final data = json.decode(response.body);
-    if (data['status'] == 'success') {
+
+    final data = jsonDecode(response.body);
+    print("Login response: $data");
+
+    if (data['status'] == true) {
       return User.fromJson(data['user']);
+    } else {
+      return null;
     }
-    return null;
   }
 
-  static Future<bool> register(String name, String email, String password) async {
+
+  static Future<bool> register(String name, String email, String password, String phone) async {
     final response = await http.post(
-      Uri.parse("$baseUrl/register.php"),
-      body: {
+      Uri.parse('$baseUrl/register.php'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
         'name': name,
         'email': email,
         'password': password,
-      },
+        'phone': phone,
+      }),
     );
-    print(">>> RESPONSE BODY:");
-    print(response.body); // 👈 in ra nội dung phản hồi thật
 
-    try {
-      final data = json.decode(response.body);
-      return data['status'] == 'success';
-    } catch (e) {
-      print(">>> JSON Decode Error: $e");
-      return false;
-    }
+    final data = jsonDecode(response.body);
+    print("Đăng ký response: $data");
+    return data['status'] == true;
   }
+
+
+
 
 
   static Future<List<Order>> fetchOrders(int userId) async {
@@ -68,6 +89,20 @@ class ApiService {
     } else {
       throw Exception("Failed to load orders");
     }
+  }
+
+  static Future<bool> addToCart(int userId, int productId, int quantity, double price) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/add_to_cart.php"),
+      body: {
+        'id_user': userId.toString(),
+        'id_product': productId.toString(),
+        'quantity': quantity.toString(),
+        'price': price.toString(),
+      },
+    );
+    final data = json.decode(response.body);
+    return data['status'] == 'success';
   }
 
   static Future<bool> placeOrder(int userId, List<Map<String, dynamic>> items, double total) async {
@@ -83,4 +118,36 @@ class ApiService {
     final data = json.decode(response.body);
     return data['status'] == 'success';
   }
+
+  static Future<List<CartItem>> getCart(int userId) async {
+    final response = await http.get(Uri.parse('$baseUrl/cart.php?user_id=$userId'));
+    if (response.statusCode == 200) {
+      List data = jsonDecode(response.body);
+      return data.map((item) => CartItem.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load cart');
+    }
+  }
+
+  static Future<void> updateCart(int userId, int productId, int newQty) async {
+    await http.post(Uri.parse('$baseUrl/update_cart.php'), body: {
+      'user_id': userId.toString(),
+      'product_id': productId.toString(),
+      'quantity': newQty.toString(),
+    });
+  }
+
+  static Future<void> deleteCartItem(int userId, int productId) async {
+    await http.post(Uri.parse('$baseUrl/delete_cart.php'), body: {
+      'user_id': userId.toString(),
+      'product_id': productId.toString(),
+    });
+  }
+
+  static Future<void> checkoutCart(int userId) async {
+    await http.post(Uri.parse('$baseUrl/checkout_cart.php'), body: {
+      'user_id': userId.toString(),
+    });
+  }
+
 }

@@ -6,7 +6,7 @@ $user_id = $data["user_id"];
 $items = $data["items"];
 $total = $data["total_price"];
 
-$stmt = $conn->prepare("INSERT INTO orders (user_id, total_price, order_date, status) VALUES (?, ?, NOW(), 0)");
+$stmt = $conn->prepare("INSERT INTO tbl_order (user_id, total_price, order_date, status) VALUES (?, ?, NOW(), 0)");
 $stmt->bind_param("id", $user_id, $total);
 
 if ($stmt->execute()) {

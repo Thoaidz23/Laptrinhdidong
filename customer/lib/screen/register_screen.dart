@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
-import '../widget/header.dart'; // 👉 Thêm dòng này
+import '../widget/header.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -10,8 +10,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final _lastNameController = TextEditingController();
-  final _firstNameController = TextEditingController();
+  final _fullNameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -27,10 +26,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     bool success = await ApiService.register(
-      _firstNameController.text + ' ' + _lastNameController.text,
+      _fullNameController.text,
       _emailController.text,
       _passwordController.text,
+      _phoneController.text,
     );
+
     if (success) {
       setState(() => message = 'Đăng ký thành công!');
       Future.delayed(const Duration(seconds: 1), () {
@@ -66,9 +67,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const Header(), // 👉 Sử dụng header đã tách
+            const Header(),
 
-            // Form
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -86,8 +86,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    _buildTextField("Họ của bạn *", _lastNameController),
-                    _buildTextField("Tên của bạn *", _firstNameController),
+
+                    _buildTextField("Họ và tên *", _fullNameController),
                     _buildTextField("Số điện thoại *", _phoneController),
                     _buildTextField("Địa chỉ E-mail *", _emailController),
                     _buildTextField(
@@ -102,7 +102,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
 
-                    // Checkbox
                     Row(
                       children: [
                         Checkbox(

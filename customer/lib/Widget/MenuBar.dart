@@ -26,16 +26,17 @@ class BottomNavBar extends StatelessWidget {
           label: "Nhà",
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.restaurant_menu_outlined),
-          label: "Thực đơn",
+          icon: Icon(Icons.shopping_bag_outlined),
+          label: "Giỏ hàng",
         ),
         BottomNavigationBarItem(
           icon: Icon(FontAwesomeIcons.tags),
-          label: "Khuyến mãi",
+          label: "Danh mục",
         ),
+
         BottomNavigationBarItem(
-          icon: Icon(Icons.shopping_bag_outlined),
-          label: "Giỏ hàng",
+          icon: Icon(Icons.restaurant_menu_outlined),
+          label: "Đơn Hàng",
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.menu),

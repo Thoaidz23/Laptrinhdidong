@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
-import '../main.dart';
+import 'package:http/http.dart' as http;
+import '../model/user.dart';
+import '../screen/home_screen.dart';
 import '../Widget/Header.dart';
-import '../Widget/MenuBar.dart'; // ✅ Thêm import
+import '../Widget/MenuBar.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,29 +14,49 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  String error = '';
+  String _errorMessage = '';
   int _selectedIndex = 0;
 
-  void _login() async {
-    final user = await ApiService.login(
-      _emailController.text.trim(),
-      _passwordController.text.trim(),
-    );
-    if (user != null) {
-      setState(() => error = '');
-      currentUser = user;
-      Navigator.pushReplacementNamed(context, '/');
-    } else {
-      setState(() => error = 'Sai email hoặc mật khẩu');
+  Future<void> _login() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      setState(() => _errorMessage = 'Vui lòng nhập đầy đủ thông tin');
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2/ttsfood/api/login.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
+      );
+
+      final body = utf8.decode(response.bodyBytes);
+      if (response.statusCode == 200 && body.startsWith('{')) {
+        final data = jsonDecode(body);
+        if (data['status'] == true) {
+          currentUser = User.fromJson(data['user']);
+          Navigator.pop(context); // trở về MainScreen có MenuBar
+
+        } else {
+          setState(() => _errorMessage = data['message'] ?? 'Sai thông tin đăng nhập');
+        }
+      } else {
+        setState(() => _errorMessage = 'Lỗi phản hồi từ máy chủ');
+      }
+    } catch (e) {
+      setState(() => _errorMessage = 'Không thể kết nối tới server');
     }
   }
 
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
-    // TODO: chuyển trang nếu cần
+    // TODO: Chuyển trang nếu cần
   }
 
   @override
@@ -46,7 +68,6 @@ class _LoginScreenState extends State<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Header(),
-
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
@@ -92,10 +113,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    if (error.isNotEmpty)
+                    if (_errorMessage.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 10),
-                        child: Text(error, style: const TextStyle(color: Colors.red)),
+                        child: Text(_errorMessage, style: const TextStyle(color: Colors.red)),
                       ),
                     SizedBox(
                       width: double.infinity,
@@ -117,7 +138,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 30),
                     Center(
                       child: GestureDetector(
-                        onTap: () => Navigator.pushNamed(context, '/register'),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/register');
+                        },
                         child: const Text.rich(
                           TextSpan(
                             text: 'Bạn chưa có tài khoản? ',
@@ -138,8 +161,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
       ),
-
-      // ✅ Thêm MenuBar giống như hình
       bottomNavigationBar: BottomNavBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
