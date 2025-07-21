@@ -69,7 +69,8 @@ class ApiService {
   }
 
 
-  static Future<bool> register(String name, String email, String password, String phone) async {
+  static Future<Map<String, dynamic>> register(
+      String name, String email, String password, String phone, String address) async {
     final response = await http.post(
       Uri.parse('$baseUrl/register.php'),
       headers: {'Content-Type': 'application/json'},
@@ -78,12 +79,20 @@ class ApiService {
         'email': email,
         'password': password,
         'phone': phone,
+        'address': address,
       }),
     );
 
-    final data = jsonDecode(response.body);
-    print("Đăng ký response: $data");
-    return data['status'] == true;
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print("Đăng ký response: $data");
+      return data; // trả luôn message từ server
+    } else {
+      return {
+        'status': false,
+        'message': 'Lỗi kết nối server'
+      };
+    }
   }
 
   static Future<List<Order>> fetchOrders(int userId) async {
@@ -155,8 +164,39 @@ class ApiService {
     });
   }
 
+  Future<User?> fetchUserById(int id) async {
+    final url = Uri.parse('$baseUrl/user.php?id=$id');
+    final response = await http.get(url);
+
+    print("User JSON: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      // Đảm bảo là Map<String, dynamic>, không phải List hoặc String
+      if (data is Map<String, dynamic> && data.containsKey('id_user')) {
+        return User.fromJson(data);
+      } else {
+        print("Không phải dữ liệu người dùng hợp lệ");
+        return null;
+      }
+    } else {
+      throw Exception('Failed to load user');
+    }
+  }
 
 
-
-
+  static Future<bool> updateUser(User user) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/update_user.php'),
+      body: {
+        'id_user': user.id.toString(),
+        'name': user.name,
+        'email': user.email,
+        'phone': user.phone,
+        'address': user.address,
+      },
+    );
+    return response.statusCode == 200 && response.body.contains('success');
+  }
 }

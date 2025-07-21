@@ -1,55 +1,36 @@
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
-import '../model/cart_item.dart';
-import '../model/user.dart';
 
 class CartScreen extends StatefulWidget {
-  final User currentUser;
-
-  const CartScreen({super.key, required this.currentUser});
+  const CartScreen({super.key});
 
   @override
   State<CartScreen> createState() => _CartScreenState();
 }
 
 class _CartScreenState extends State<CartScreen> {
-  List<CartItem> _cartItems = [];
-  bool _isLoading = true;
+  List<Map<String, dynamic>> _cartItems = [
+    {'id': 1, 'name': 'Bánh mì thịt', 'quantity': 2, 'price': 15000},
+    {'id': 2, 'name': 'Cơm gà xối mỡ', 'quantity': 1, 'price': 30000},
+    {'id': 3, 'name': 'Trà sữa trân châu', 'quantity': 3, 'price': 25000},
+  ];
 
-  @override
-  void initState() {
-    super.initState();
-    _loadCart();
-  }
+  double get total => _cartItems.fold(
+      0, (sum, item) => sum + item['price'] * item['quantity']);
 
-  Future<void> _loadCart() async {
-    try {
-      final items = await ApiService.getCart(widget.currentUser.id); // ✅ dùng đúng hàm
-      setState(() {
-        _cartItems = items;
-        _isLoading = false;
-      });
-    } catch (e) {
-      print("Failed to load cart: $e");
-    }
-  }
-
-  Future<void> _removeItem(int productId) async {
-    await ApiService.deleteCartItem(widget.currentUser.id, productId);
-    _loadCart();
+  void _removeItem(int index) {
+    setState(() {
+      _cartItems.removeAt(index);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    double total = _cartItems.fold(0, (sum, item) => sum + (item.price * item.quantity));
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Giỏ hàng"),
+        backgroundColor: Colors.green,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _cartItems.isEmpty
+      body: _cartItems.isEmpty
           ? const Center(child: Text("Giỏ hàng trống."))
           : Column(
         children: [
@@ -59,11 +40,12 @@ class _CartScreenState extends State<CartScreen> {
               itemBuilder: (context, index) {
                 final item = _cartItems[index];
                 return ListTile(
-                  title: Text("Món ${item.idProduct}"),
-                  subtitle: Text("SL: ${item.quantity} | Giá: ${item.price}đ"),
+                  leading: const Icon(Icons.fastfood, color: Colors.orange),
+                  title: Text(item['name']),
+                  subtitle: Text("SL: ${item['quantity']} | Giá: ${item['price']}đ"),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => _removeItem(item.idProduct),
+                    onPressed: () => _removeItem(index),
                   ),
                 );
               },
@@ -74,8 +56,10 @@ class _CartScreenState extends State<CartScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text("Tổng cộng:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Text("${total.toStringAsFixed(0)}đ", style: const TextStyle(fontSize: 18)),
+                const Text("Tổng cộng:",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text("${total.toStringAsFixed(0)}đ",
+                    style: const TextStyle(fontSize: 18, color: Colors.green)),
               ],
             ),
           ),
