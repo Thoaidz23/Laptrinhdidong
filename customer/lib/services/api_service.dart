@@ -41,6 +41,15 @@ class ApiService {
     }
   }
 
+  Future<List<Product>> fetchProductsByCategory(int idCategory) async {
+    final response = await http.get(Uri.parse('$baseUrl/product_by_category.php?id=$idCategory'));
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = json.decode(response.body);
+      return jsonData.map((json) => Product.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load products by category');
+    }
+  }
 
   static Future<User?> login(String email, String password) async {
     final response = await http.post(
@@ -76,10 +85,6 @@ class ApiService {
     print("Đăng ký response: $data");
     return data['status'] == true;
   }
-
-
-
-
 
   static Future<List<Order>> fetchOrders(int userId) async {
     final response = await http.get(Uri.parse("$baseUrl/get_user_orders.php?user_id=$userId"));
@@ -149,5 +154,9 @@ class ApiService {
       'user_id': userId.toString(),
     });
   }
+
+
+
+
 
 }

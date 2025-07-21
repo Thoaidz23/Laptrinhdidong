@@ -5,25 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="32724272-a6f1-4507-8293-ca812a9f67c6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/customer/lib/screen/category_screen.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/customer/lib/screen/main_screen.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/customer/lib/screen/more_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/create_order.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/create_order.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/get_products.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/get_products.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/get_user_orders.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/get_user_orders.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/login.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/login.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/register.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/register.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/customer/lib/Widget/CategorySection.dart" beforeDir="false" afterPath="$PROJECT_DIR$/customer/lib/Widget/CategorySection.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/customer/lib/Widget/MenuBar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/customer/lib/Widget/MenuBar.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/customer/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/customer/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/customer/lib/model/cart_item.dart" beforeDir="false" afterPath="$PROJECT_DIR$/customer/lib/model/cart_item.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/customer/lib/Widget/ProductGrid.dart" beforeDir="false" afterPath="$PROJECT_DIR$/customer/lib/Widget/ProductGrid.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/customer/lib/model/product.dart" beforeDir="false" afterPath="$PROJECT_DIR$/customer/lib/model/product.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/customer/lib/model/user.dart" beforeDir="false" afterPath="$PROJECT_DIR$/customer/lib/model/user.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/customer/lib/provider/cart_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/customer/lib/provider/cart_provider.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/customer/lib/screen/cart_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/customer/lib/screen/cart_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/customer/lib/screen/login_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/customer/lib/screen/login_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/customer/lib/screen/product_detail_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/customer/lib/screen/product_detail_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/customer/lib/screen/register_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/customer/lib/screen/register_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/customer/lib/screen/home_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/customer/lib/screen/home_screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/customer/lib/services/api_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/customer/lib/services/api_service.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

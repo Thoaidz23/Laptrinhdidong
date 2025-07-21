@@ -4,7 +4,9 @@ import '../services/api_service.dart';
 import '../screen/product_detail_screen.dart';
 
 class ProductGrid extends StatefulWidget {
-  const ProductGrid({super.key});
+  final int? idCategoryProduct; // Cho phép null
+
+  const ProductGrid({super.key, this.idCategoryProduct});
 
   @override
   State<ProductGrid> createState() => _ProductGridState();
@@ -12,14 +14,6 @@ class ProductGrid extends StatefulWidget {
 
 class _ProductGridState extends State<ProductGrid> {
   late Future<List<Product>> _productsFuture;
-
-  // Danh sách 4 URL ảnh khác nhau
-  final imageUrls = [
-    'https://th.bing.com/th/id/OIP.GI7Tt7hBs07MsvkgYaMa3AHaHa?w=194&h=194&c=7&r=0&o=7&dpr=1.6&pid=1.7&rm=3',
-    'https://th.bing.com/th/id/OIP.G8FUCxYIkXuTamNNfORYggHaHa?w=194&h=194&c=7&r=0&o=7&dpr=1.6&pid=1.7&rm=3',
-    'https://th.bing.com/th/id/OIP.LStbJVkpR_WMsNpbDJ_LtwHaHa?w=193&h=194&c=7&r=0&o=7&dpr=1.6&pid=1.7&rm=3',
-    'https://th.bing.com/th/id/OIP.23Ev93_vHW2OC6l0ldQS2gHaHa?w=163&h=180&c=7&r=0&o=7&dpr=1.6&pid=1.7&rm=3',
-  ];
 
   @override
   void initState() {
@@ -40,9 +34,20 @@ class _ProductGridState extends State<ProductGrid> {
           return const Center(child: Text('Không có sản phẩm'));
         }
 
-        final products = snapshot.data!;
+        List<Product> products = snapshot.data!;
+
+        // Nếu có truyền idCategoryProduct → lọc theo category
+        if (widget.idCategoryProduct != null) {
+          products = products.where((product) => product.id_category_product == widget.idCategoryProduct).toList();
+        } else {
+          // Nếu không truyền → lấy 4 sản phẩm mới nhất
+          products = products.take(4).toList();
+        }
+
         return GridView.builder(
           padding: const EdgeInsets.all(8),
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: 8,
@@ -73,11 +78,10 @@ class _ProductGridState extends State<ProductGrid> {
                       child: ClipRRect(
                         borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                         child: Image.network(
-                          imageUrls[index % imageUrls.length],
+                          product.imageUrl,
                           width: double.infinity,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                          const Icon(Icons.error),
+                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
                         ),
                       ),
                     ),
