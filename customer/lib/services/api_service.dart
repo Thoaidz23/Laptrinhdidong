@@ -5,6 +5,7 @@ import '../model/product.dart';
 import '../model/order.dart';
 import '../model/user.dart';
 import '../model/cart_item.dart';
+import '../model/about.dart';
 
 class ApiService {
   static String baseUrl = "http://10.0.2.2/ttsfood/api"; // localhost for Android emulator
@@ -69,7 +70,8 @@ class ApiService {
   }
 
 
-  static Future<bool> register(String name, String email, String password, String phone) async {
+  static Future<Map<String, dynamic>> register(
+      String name, String email, String password, String phone, String address) async {
     final response = await http.post(
       Uri.parse('$baseUrl/register.php'),
       headers: {'Content-Type': 'application/json'},
@@ -78,13 +80,22 @@ class ApiService {
         'email': email,
         'password': password,
         'phone': phone,
+        'address': address,
       }),
     );
 
-    final data = jsonDecode(response.body);
-    print("Đăng ký response: $data");
-    return data['status'] == true;
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print("Đăng ký response: $data");
+      return data; // trả luôn message từ server
+    } else {
+      return {
+        'status': false,
+        'message': 'Lỗi kết nối server'
+      };
+    }
   }
+
 
   static Future<List<Order>> fetchOrders(int userId) async {
     final response = await http.get(Uri.parse("$baseUrl/get_user_orders.php?user_id=$userId"));
@@ -155,6 +166,20 @@ class ApiService {
     });
   }
 
+  static Future<List<FooterItem>> fetchFooterItems() async {
+    final response = await http.get(Uri.parse('$baseUrl/get_about.php'));
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      if (jsonData['status'] == true && jsonData['data'] != null) {
+        List<dynamic> list = jsonData['data'];
+        return list.map((item) => FooterItem.fromJson(item)).toList();
+      } else {
+        return [];
+      }
+    } else {
+      throw Exception('Failed to load footer items');
+    }
+  }
 
 
 

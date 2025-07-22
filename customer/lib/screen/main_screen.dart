@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../Widget/MenuBar.dart';
 import 'home_screen.dart';
-import 'order_screen.dart';
 import 'cart_screen.dart';
 import 'login_screen.dart';
 import 'category_screen.dart';
 import 'more_screen.dart';
+import 'order_history_screen.dart'; // ✅ Thêm import màn lịch sử
 import '../model/user.dart';
 
 class MainScreen extends StatefulWidget {
@@ -33,7 +33,7 @@ class _MainScreenState extends State<MainScreen> {
           });
           displayedScreen = const SizedBox.shrink();
         } else {
-          displayedScreen = const OrderScreen();
+          displayedScreen = const CategoryScreen();
         }
         break;
       case 2:
@@ -43,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
           });
           displayedScreen = const SizedBox.shrink();
         } else {
-          displayedScreen = const CategoryScreen();
+          displayedScreen = const CartScreen();
         }
         break;
       case 3:
@@ -53,7 +53,7 @@ class _MainScreenState extends State<MainScreen> {
           });
           displayedScreen = const SizedBox.shrink();
         } else {
-          displayedScreen = CartScreen(currentUser: currentUser!);
+          displayedScreen = const OrderHistoryScreen(); // ✅ Đổi sang màn lịch sử
         }
         break;
       case 4:
