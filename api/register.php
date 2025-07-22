@@ -5,8 +5,8 @@ $data = json_decode(file_get_contents("php://input"));
 $name = $data->name;
 $email = $data->email;
 $password = $data->password;
-$phone = $data->phone ?? ''; // thêm dòng này
-$address = $data->address ?? ''; // nếu muốn thêm địa chỉ
+$phone = $data->phone ?? '';
+$address = $data->address ?? '';
 
 $check = "SELECT * FROM tbl_user WHERE email = '$email'";
 $result = $conn->query($check);

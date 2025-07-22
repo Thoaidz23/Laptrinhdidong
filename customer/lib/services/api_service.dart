@@ -5,6 +5,7 @@ import '../model/product.dart';
 import '../model/order.dart';
 import '../model/user.dart';
 import '../model/cart_item.dart';
+import '../model/about.dart';
 
 class ApiService {
   static String baseUrl = "http://10.0.2.2/ttsfood/api"; // localhost for Android emulator
@@ -94,6 +95,7 @@ class ApiService {
       };
     }
   }
+
 
   static Future<List<Order>> fetchOrders(int userId) async {
     final response = await http.get(Uri.parse("$baseUrl/get_user_orders.php?user_id=$userId"));
@@ -194,6 +196,19 @@ class ApiService {
     });
   }
 
+  static Future<List<FooterItem>> fetchFooterItems() async {
+    final response = await http.get(Uri.parse('$baseUrl/get_about.php'));
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      if (jsonData['status'] == true && jsonData['data'] != null) {
+        List<dynamic> list = jsonData['data'];
+        return list.map((item) => FooterItem.fromJson(item)).toList();
+      } else {
+        return [];
+      }
+    } else {
+      throw Exception('Failed to load footer items');
+    }}
   Future<User?> fetchUserById(int id) async {
     final url = Uri.parse('$baseUrl/user.php?id=$id');
     final response = await http.get(url);
@@ -212,6 +227,7 @@ class ApiService {
       }
     } else {
       throw Exception('Failed to load user');
+
     }
   }
 
