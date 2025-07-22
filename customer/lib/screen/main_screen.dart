@@ -27,14 +27,9 @@ class _MainScreenState extends State<MainScreen> {
         displayedScreen = const HomeScreen();
         break;
       case 1:
-        if (currentUser == null) {
-          Future.microtask(() {
-            Navigator.pushNamed(context, '/login').then((_) => setState(() {}));
-          });
-          displayedScreen = const SizedBox.shrink();
-        } else {
-          displayedScreen = const CategoryScreen();
-        }
+
+        displayedScreen = const CategoryScreen();
+
         break;
       case 2:
         if (currentUser == null) {
@@ -43,7 +38,9 @@ class _MainScreenState extends State<MainScreen> {
           });
           displayedScreen = const SizedBox.shrink();
         } else {
+
           displayedScreen = const CartScreen();
+
         }
         break;
       case 3:
@@ -53,7 +50,9 @@ class _MainScreenState extends State<MainScreen> {
           });
           displayedScreen = const SizedBox.shrink();
         } else {
+
           displayedScreen = const OrderHistoryScreen(); // ✅ Đổi sang màn lịch sử
+
         }
         break;
       case 4:

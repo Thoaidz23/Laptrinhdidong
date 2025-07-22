@@ -17,8 +17,8 @@ if ($result->num_rows > 0) {
         'message' => 'Email đã tồn tại'
     ]);
 } else {
-    $sql = "INSERT INTO tbl_user (name, email, password, phone, address)
-            VALUES ('$name', '$email', '$password', '$phone', '$address')";
+    $sql = "INSERT INTO tbl_user (name, email, password, phone, address, role)
+            VALUES ('$name', '$email', '$password', '$phone', '$address',3)";
     if ($conn->query($sql) === TRUE) {
         echo json_encode([
             'status' => true,

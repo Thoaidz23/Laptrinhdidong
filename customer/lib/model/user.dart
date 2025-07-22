@@ -1,5 +1,3 @@
-
-// models/user.dart
 class User {
   final int id;
   final String name;
@@ -16,13 +14,18 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
+    print("User JSON: $json"); // debug kiểm tra
+
     return User(
-      id: int.parse(json['id_user'].toString()),
-      name: json['name'],
-      email: json['email'],
+      id: int.tryParse(json['id_user']?.toString() ?? '0') ?? 0,
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
       phone: json['phone'] ?? '',
       address: json['address'] ?? '',
     );
   }
+
 }
+
+// Biến toàn cục để lưu người dùng hiện tại
 User? currentUser;

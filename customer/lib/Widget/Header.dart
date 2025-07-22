@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import '../screen/account_screen.dart'; // Import đúng đường dẫn đến file AccountPage
+import '../Widget/Header.dart';
 class Header extends StatelessWidget {
   const Header({super.key});
 
@@ -24,13 +25,21 @@ class Header extends StatelessWidget {
             ),
           ),
           Row(
-            children: const [
-              Text(
+            children: [
+              const Text(
                 'English',
                 style: TextStyle(fontSize: 20),
               ),
-              SizedBox(width: 30),
-              Icon(Icons.account_circle, size: 38),
+              const SizedBox(width: 30),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AccountPage()),
+                  );
+                },
+                child: const Icon(Icons.account_circle, size: 38),
+              ),
             ],
           )
         ],

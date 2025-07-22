@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../widget/header.dart';
+import '../widget/MenuBar.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -10,13 +11,14 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  int _selectedIndex = 0;
   final _formKey = GlobalKey<FormState>();
 
   final _fullNameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _addressController = TextEditingController(); // 💡 Mới thêm
+  final _addressController = TextEditingController();
 
   bool agree = false;
   bool obscurePass = true;
@@ -54,7 +56,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Navigator.pop(context);
       });
     }
+  }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    // TODO: Chuyển trang nếu cần
   }
 
   Widget _buildTextFormField({
@@ -134,7 +142,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           if (value.trim().length > 30) {
                             return "Email không được quá 30 ký tự.";
                           }
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value.trim())) {
+                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                              .hasMatch(value.trim())) {
                             return "Email không hợp lệ.";
                           }
                           return null;
@@ -172,7 +181,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         controller: _passwordController,
                         isPassword: true,
                         suffix: IconButton(
-                          icon: Icon(obscurePass ? Icons.visibility_off : Icons.visibility),
+                          icon: Icon(
+                              obscurePass ? Icons.visibility_off : Icons.visibility),
                           onPressed: () => setState(() => obscurePass = !obscurePass),
                         ),
                         validator: (value) {
@@ -185,7 +195,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           }
                           bool hasLetter = pass.contains(RegExp(r'[A-Za-z]'));
                           bool hasDigit = pass.contains(RegExp(r'[0-9]'));
-                          bool hasSpecial = pass.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'));
+                          bool hasSpecial =
+                          pass.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'));
                           if (!hasLetter || !hasDigit || !hasSpecial) {
                             return "Mật khẩu phải có chữ, số và ký tự đặc biệt.";
                           }
@@ -203,15 +214,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               text: TextSpan(
                                 style: const TextStyle(color: Colors.black),
                                 children: [
-                                  const TextSpan(text: "Tôi đã đọc và đồng ý với các "),
+                                  const TextSpan(
+                                      text: "Tôi đã đọc và đồng ý với các "),
                                   TextSpan(
                                     text: "Chính Sách Hoạt Động",
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                   const TextSpan(text: " và "),
                                   TextSpan(
                                     text: "Chính Sách Bảo Mật Thông Tin",
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
@@ -225,7 +239,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: Text(
                             message,
                             style: TextStyle(
-                              color: message.contains("thành công") ? Colors.green : Colors.red,
+                              color: message.contains("thành công")
+                                  ? Colors.green
+                                  : Colors.red,
                             ),
                           ),
                         ),
@@ -251,7 +267,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               strokeWidth: 2,
                             ),
                           )
-                              : const Text("Đăng ký", style: TextStyle(color: Colors.white)),
+                              : const Text("Đăng ký",
+                              style: TextStyle(color: Colors.white)),
                         ),
                       ),
                       const SizedBox(height: 40),
@@ -280,6 +297,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
     );
   }
