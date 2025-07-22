@@ -2,25 +2,54 @@
 include 'db.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
-$user_id = $data["user_id"];
-$items = $data["items"];
-$total = $data["total_price"];
 
-$stmt = $conn->prepare("INSERT INTO tbl_order (user_id, total_price, order_date, status) VALUES (?, ?, NOW(), 0)");
+$id_user = $data['id_user'];
+$name_user = $data['name_user'];
+$address = $data['address'];
+$phone = $data['phone'];
+$method = $data['method'];
+$cart = $data['cart'];
 
-$stmt->bind_param("id", $user_id, $total);
+$code_order = uniqid('ORD');
+$total_price = 0;
+foreach ($cart as $item) {
+    $total_price += $item['quantity'] * $item['price'];
+}
 
-if ($stmt->execute()) {
-    $order_id = $stmt->insert_id;
+$status = 'Chờ xác nhận';        // Trạng thái đơn hàng
+$paystatus = 'Chưa thanh toán';  // Vì COD
 
-    $detail_stmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)");
-    foreach ($items as $item) {
-        $detail_stmt->bind_param("iii", $order_id, $item["product_id"], $item["quantity"]);
-        $detail_stmt->execute();
+$date = date('Y-m-d H:i:s');
+
+// Thêm vào bảng tbl_order
+$sql_order = "INSERT INTO tbl_order (code_order, id_user, total_price, status, paystatus, method, date, name_user, address, phone)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+$stmt_order = $conn->prepare($sql_order);
+$stmt_order->bind_param("sidsssssss", $code_order, $id_user, $total_price, $status, $paystatus, $method, $date, $name_user, $address, $phone);
+
+if ($stmt_order->execute()) {
+    // Sau khi tạo đơn hàng thành công, thêm chi tiết sản phẩm
+    foreach ($cart as $item) {
+        $id_product = $item['id_product'];
+        $quantity = $item['quantity'];
+
+        $sql_detail = "INSERT INTO tbl_order_detail (code_order, id_product, quantity_product)
+                       VALUES (?, ?, ?)";
+        $stmt_detail = $conn->prepare($sql_detail);
+        $stmt_detail->bind_param("sii", $code_order, $id_product, $quantity);
+        $stmt_detail->execute();
     }
 
-    echo json_encode(["status" => "success", "order_id" => $order_id]);
+    // (Tùy chọn) Xoá giỏ hàng của user sau khi đặt hàng
+    $sql_delete_cart = "DELETE FROM tbl_cart WHERE id_user = ?";
+    $stmt_del = $conn->prepare($sql_delete_cart);
+    $stmt_del->bind_param("i", $id_user);
+    $stmt_del->execute();
+
+    echo json_encode(["status" => true, "message" => "Đặt hàng thành công"]);
 } else {
-    echo json_encode(["status" => "error"]);
+    echo json_encode(["status" => false, "message" => "Đặt hàng thất bại"]);
 }
+
+$conn->close();
 ?>

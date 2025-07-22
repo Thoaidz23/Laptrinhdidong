@@ -22,4 +22,9 @@ if ($result->num_rows > 0) {
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("iiid", $id_user, $id_product, $quantity, $price);
 }
-echo json_encode(["status" => $stmt->execute()]);
+if ($stmt->execute()) {
+    echo json_encode(["status" => true]);
+} else {
+    echo json_encode(["status" => false, "error" => $stmt->error]);
+}
+
