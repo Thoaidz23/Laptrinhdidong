@@ -26,10 +26,6 @@ class Header extends StatelessWidget {
           ),
           Row(
             children: [
-              const Text(
-                'English',
-                style: TextStyle(fontSize: 20),
-              ),
               const SizedBox(width: 30),
               GestureDetector(
                 onTap: () {

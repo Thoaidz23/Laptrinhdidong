@@ -30,6 +30,8 @@ class _MainScreenState extends State<MainScreen> {
         displayedScreen = const CategoryScreen();
         break;
       case 2:
+
+
         if (currentUser == null) {
           Future.microtask(() {
             Navigator.pushNamed(context, '/login').then((_) => setState(() {}));

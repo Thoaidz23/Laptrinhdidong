@@ -4,10 +4,10 @@
   import '../widget/MenuBar.dart';
   import '../widget/header.dart';
   import '../services/api_service.dart';
+  import '../model/user.dart';
 
   class ProductDetailScreen extends StatefulWidget {
     final Product product;
-
     const ProductDetailScreen({super.key, required this.product});
 
     @override
@@ -17,10 +17,12 @@
   class _ProductDetailScreenState extends State<ProductDetailScreen> {
     late List<String> imageUrls;
     int _currentPage = 0;
+    int _quantity = 1;
     late PageController _pageController;
 
     @override
     void initState() {
+
       super.initState();
       final product = widget.product;
       // Nếu chỉ có 1 ảnh:
@@ -204,42 +206,109 @@
 
         // ✅ Đây là nơi đặt các nút ở dưới cùng của màn hình
         bottomNavigationBar: Padding(
+
           padding: const EdgeInsets.all(16.0),
-          child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Mua ngay thành công (demo)')),
-                    );
-                  },
-                  icon: const Icon(Icons.shopping_cart_checkout),
-                  label: const Text('Mua ngay',
-                      style: TextStyle(fontSize: 16, color: Colors.white)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    shape: RoundedRectangleBorder(
+              // Hàng chứa số lượng + nút thêm giỏ hàng
+              Row(
+                children: [
+                  // 🔢 Nút chọn số lượng
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8),
                     ),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove),
+                          onPressed: () {
+                            setState(() {
+                              if (_quantity > 1) _quantity--;
+                            });
+                          },
+                        ),
+                        Text('$_quantity', style: const TextStyle(fontSize: 18)),
+                        IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () {
+                            setState(() {
+                              _quantity++;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+
+                  const SizedBox(width: 12),
+
+                  // 🛒 Nút thêm giỏ hàng
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        final userId = currentUser?.id; // ⚠️ Lấy từ user đã đăng nhập (tạm hardcoded)
+
+                        if (userId == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Bạn cần đăng nhập để thêm vào giỏ hàng')),
+                          );
+                          return;
+                        }
+                        final product = widget.product;
+
+                        final success = await ApiService.addToCart(
+                          userId,
+                          product.id,
+                          _quantity,     // từ số lượng đã chọn
+                          product.price,
+                        );
+
+                        if (success) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Đã thêm vào giỏ hàng')),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Lỗi khi thêm vào giỏ hàng')),
+                          );
+                        }
+                      },
+
+                      icon: const Icon(Icons.add_shopping_cart),
+                      label: const Text('Thêm vào giỏ',
+                          style: TextStyle(fontSize: 16, color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 16),
-              Expanded(
+              const SizedBox(height: 12),
+
+              // 🔴 Nút mua ngay (to gấp đôi, nằm dưới)
+              SizedBox(
+                width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Đã thêm vào giỏ hàng (demo)')),
+                      const SnackBar(content: Text('Mua ngay thành công (demo)')),
                     );
                   },
-                  icon: const Icon(Icons.add_shopping_cart),
-                  label: const Text('Thêm vào giỏ',
-                      style: TextStyle(fontSize: 16, color: Colors.white)),
+                  label: const Text('Mua ngay',
+                      style: TextStyle(fontSize: 18, color: Colors.white)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: Colors.redAccent,
+                    padding: const EdgeInsets.symmetric(vertical: 18), // 👈 to hơn
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -249,6 +318,7 @@
             ],
           ),
         ),
+
       );
     }
   }

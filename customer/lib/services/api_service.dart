@@ -108,16 +108,21 @@ class ApiService {
   static Future<bool> addToCart(int userId, int productId, int quantity, double price) async {
     final response = await http.post(
       Uri.parse("$baseUrl/add_to_cart.php"),
-      body: {
-        'id_user': userId.toString(),
-        'id_product': productId.toString(),
-        'quantity': quantity.toString(),
-        'price': price.toString(),
-      },
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        'id_user': userId,
+        'id_product': productId,
+        'quantity': quantity,
+        'price': price,
+      }),
     );
+
     final data = json.decode(response.body);
-    return data['status'] == 'success';
+    print("🛒 addToCart response: $data");
+
+    return data['status'] == true;
   }
+
 
   static Future<bool> placeOrder(int userId, List<Map<String, dynamic>> items, double total) async {
     final response = await http.post(
@@ -134,29 +139,54 @@ class ApiService {
   }
 
   static Future<List<CartItem>> getCart(int userId) async {
-    final response = await http.get(Uri.parse('$baseUrl/cart.php?user_id=$userId'));
+    final response = await http.get(Uri.parse('$baseUrl/get_cart.php?id_user=$userId'));
+
     if (response.statusCode == 200) {
-      List data = jsonDecode(response.body);
-      return data.map((item) => CartItem.fromJson(item)).toList();
+      final List<dynamic> jsonData = json.decode(response.body);
+      return jsonData.map((json) => CartItem.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load cart');
     }
   }
 
+
   static Future<void> updateCart(int userId, int productId, int newQty) async {
-    await http.post(Uri.parse('$baseUrl/update_cart.php'), body: {
-      'user_id': userId.toString(),
-      'product_id': productId.toString(),
-      'quantity': newQty.toString(),
-    });
+    final url = Uri.parse('$baseUrl/update_cart.php');
+
+    await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'id_user': userId,
+        'id_product': productId,
+        'quantity': newQty,
+      }),
+    );
   }
 
-  static Future<void> deleteCartItem(int userId, int productId) async {
-    await http.post(Uri.parse('$baseUrl/delete_cart.php'), body: {
-      'user_id': userId.toString(),
-      'product_id': productId.toString(),
-    });
+  static Future<void> deleteCartItem(int idUser, int idProduct) async {
+    final url = Uri.parse('$baseUrl/delete_cart.php');
+
+    try {
+      final response = await http.post(
+        url,
+        body: jsonEncode({'id_user': idUser, 'id_product': idProduct}),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      final result = jsonDecode(response.body);
+      if (result['status'] == true) {
+        print("🗑️ Xóa sản phẩm khỏi giỏ hàng thành công");
+      } else {
+        print("❌ Xóa thất bại: ${result['message']}");
+      }
+    } catch (e) {
+      print('❗ Lỗi khi xóa giỏ hàng: $e');
+    }
   }
+
 
   static Future<void> checkoutCart(int userId) async {
     await http.post(Uri.parse('$baseUrl/checkout_cart.php'), body: {
