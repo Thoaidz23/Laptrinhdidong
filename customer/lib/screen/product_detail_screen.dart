@@ -13,6 +13,14 @@
     @override
     State<ProductDetailScreen> createState() => _ProductDetailScreenState();
   }
+  final Map<int, String> categoryNames = {
+    1: 'Snack',
+    2: 'Bánh',
+    3: 'Kẹo',
+    4: 'Thức uống đóng hộp',
+    5: 'Đồ ăn đóng hộp',
+    6: 'Đồ ăn liền',
+  };
 
   class _ProductDetailScreenState extends State<ProductDetailScreen> {
     late List<String> imageUrls;
@@ -25,23 +33,23 @@
       super.initState();
       final product = widget.product;
 
-      // ✅ In ra danh sách ảnh chi tiết để debug
       print('📦 Sản phẩm: ${product.name}');
+      print('🖼️ Ảnh đại diện: ${product.imageUrl}');
       if (product.images.isNotEmpty) {
         for (var img in product.images) {
           print('🖼️ Ảnh chi tiết: ID = ${img.id}, URL = ${img.fullUrl}');
         }
-      } else {
-        print('⚠️ Không có ảnh chi tiết, dùng ảnh đại diện: ${product.imageUrl}');
       }
 
-      // ✅ Nếu có danh sách ảnh chi tiết thì dùng, không thì dùng ảnh chính
-      imageUrls = product.images.isNotEmpty
-          ? product.images.map((img) => img.fullUrl).toList()
-          : [product.imageUrl];
+      // ✅ Thêm ảnh đại diện vào đầu, rồi nối ảnh chi tiết
+      imageUrls = [
+        product.imageUrl,
+        ...product.images.map((img) => img.fullUrl),
+      ];
 
       _pageController = PageController(initialPage: _currentPage);
     }
+
 
 
 
@@ -92,9 +100,9 @@
                     },
                   ),
                   const SizedBox(width: 4),
-                  const Text(
-                    "Rau củ",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  Text(
+                    categoryNames[product.id_category_product] ?? 'Danh mục',
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
