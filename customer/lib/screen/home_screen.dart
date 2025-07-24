@@ -5,7 +5,7 @@ import '../widget/header.dart';
 import '../widget/MenuBar.dart';
 import '../widget/BannerSlider.dart';
 import '../widget/ProductGrid.dart';
-
+import 'search_screen.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -56,6 +56,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: TextField(
                         controller: _searchController,
+                        onSubmitted: (value) {
+                          if (value.trim().isNotEmpty) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SearchScreen(keyword: value),
+                              ),
+                            );
+                          }
+                        },
                         decoration: InputDecoration(
                           hintText: 'Tìm món ăn, cửa hàng...',
                           hintStyle: TextStyle(color: Colors.grey[500]),
@@ -64,6 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
                         ),
                       ),
+
                     ),
                   ],
                 ),

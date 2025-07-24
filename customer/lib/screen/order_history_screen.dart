@@ -15,11 +15,11 @@ class OrderHistoryScreen extends StatefulWidget {
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   final List<String> statuses = const [
     'Tất cả',
-    'Đã giao',
-    'Đang vận chuyển',
-    'Đã hủy',
-    'Đã xác nhận',
     'Chờ xác nhận',
+    'Đã xác nhận',
+    'Đang vận chuyển',
+    'Đã giao',
+    'Đã hủy',
   ];
 
   String selectedStatus = 'Tất cả';
@@ -65,10 +65,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             ),
             child: Row(
               children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
-                ),
+                const SizedBox(height: 20, width: 50,),
                 const Expanded(
                   child: Center(
                     child: Text(
@@ -192,7 +189,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16)),
                               const SizedBox(height: 4),
-                              Text("Sản phẩm: ${order.item}"),
                               Text(
                                   "Ngày mua: ${order.date} lúc ${order.time}"),
                               Text("Tổng tiền: ${order.total}đ",

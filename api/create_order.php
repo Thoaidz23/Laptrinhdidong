@@ -1,6 +1,7 @@
 <?php
 include 'db.php';
 
+date_default_timezone_set('Asia/Ho_Chi_Minh');
 $data = json_decode(file_get_contents("php://input"), true);
 
 $id_user = $data['id_user'];
@@ -9,6 +10,7 @@ $address = $data['address'];
 $phone = $data['phone'];
 $method = (int)$data['method']; // 0 = COD, 1 = bank transfer
 $cart = $data['cart'];
+$isBuyNow = isset($data['isBuyNow']) ? $data['isBuyNow'] : false;
 
 $code_order = uniqid('ORD');
 $total_price = 0;
@@ -41,12 +43,12 @@ if ($stmt_order->execute()) {
         $stmt_detail->bind_param("sii", $code_order, $id_product, $quantity);
         $stmt_detail->execute();
     }
-
-    // Xóa giỏ hàng
+    if (!$isBuyNow) {
     $sql_delete_cart = "DELETE FROM tbl_cart WHERE id_user = ?";
     $stmt_del = $conn->prepare($sql_delete_cart);
     $stmt_del->bind_param("i", $id_user);
     $stmt_del->execute();
+}
 
     echo json_encode(["status" => true, "message" => "Đặt hàng thành công"]);
 } else {

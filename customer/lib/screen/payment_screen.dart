@@ -117,7 +117,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
             "quantity": item.quantity,
             "price": item.price,
           }).toList(),
+          "isBuyNow": widget.cartItems.length == 1 && widget.cartItems.first.idCart == 0, // 👈 Mẹo phân biệt
         }),
+
       );
 
       final result = json.decode(response.body);

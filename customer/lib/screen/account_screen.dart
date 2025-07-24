@@ -12,6 +12,12 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+  bool isEditingName = false;
+  bool isEditingPhone = false;
+  bool isEditingEmail = false;
+  bool isEditingAddress = false;
+
+
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
@@ -184,36 +190,87 @@ class _AccountPageState extends State<AccountPage> {
     ),
     child: Column(
     children: [
-    TextField(
-    controller: nameController,
-    decoration: const InputDecoration(
-    labelText: 'Họ và tên',border: OutlineInputBorder(),
-    ),
-    ),
-      const SizedBox(height: 16),
-      TextField(
-        controller: phoneController,
-        decoration: const InputDecoration(
-          labelText: 'Số điện thoại',
-          border: OutlineInputBorder(),
-        ),
+      Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: nameController,
+              readOnly: !isEditingName,
+              decoration: const InputDecoration(
+                labelText: 'Họ và tên',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+          IconButton(
+            icon: Icon(isEditingName ? Icons.check : Icons.edit),
+            onPressed: () {
+              setState(() {
+                isEditingName = !isEditingName;
+              });
+            },
+          ),
+        ],
       ),
       const SizedBox(height: 16),
-      TextField(
-        controller: emailController,
-        decoration: const InputDecoration(
-          labelText: 'Email',
-          border: OutlineInputBorder(),
-        ),
+      Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: phoneController,
+              readOnly: !isEditingPhone,
+              decoration: const InputDecoration(
+                labelText: 'Số điện thoại',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+        ],
       ),
+
       const SizedBox(height: 16),
-      TextField(
-        controller: addressController,
-        decoration: const InputDecoration(
-          labelText: 'Địa chỉ',
-          border: OutlineInputBorder(),
-        ),
+      Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: emailController,
+              readOnly: !isEditingEmail,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+        ],
       ),
+
+      const SizedBox(height: 16),
+      Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: addressController,
+              readOnly: !isEditingAddress,
+              minLines: 1,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Địa chỉ',
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+          ),
+          IconButton(
+            icon: Icon(isEditingAddress ? Icons.check : Icons.edit),
+            onPressed: () {
+              setState(() {
+                isEditingAddress = !isEditingAddress;
+              });
+            },
+          ),
+        ],
+      ),
+
       const SizedBox(height: 24),
       Center(
         child: ElevatedButton(

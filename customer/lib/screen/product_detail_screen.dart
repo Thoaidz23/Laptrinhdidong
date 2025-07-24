@@ -5,6 +5,8 @@
   import '../widget/header.dart';
   import '../services/api_service.dart';
   import '../model/user.dart';
+  import '../model/cart_item.dart';
+  import 'payment_screen.dart';
 
   class ProductDetailScreen extends StatefulWidget {
     final Product product;
@@ -319,10 +321,34 @@
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Mua ngay thành công (demo)')),
+                    final userId = currentUser?.id;
+
+                    if (userId == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Vui lòng đăng nhập để tiếp tục')),
+                      );
+                      return;
+                    }
+
+                    // Tạo một đối tượng CartItem tạm
+                    final tempCartItem = CartItem(
+                      idCart: 0, // Không cần thiết vì chưa lưu DB
+                      idUser: userId,
+                      idProduct: widget.product.id,
+                      quantity: _quantity,
+                      price: widget.product.price,
+                      name: widget.product.name,
+                      image: widget.product.image, // hoặc widget.product.imageUrl gốc nếu khác
+                    );
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PaymentScreen(cartItems: [tempCartItem]),
+                      ),
                     );
                   },
+
                   label: const Text('Mua ngay',
                       style: TextStyle(fontSize: 18, color: Colors.white)),
                   style: ElevatedButton.styleFrom(

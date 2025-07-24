@@ -18,6 +18,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _addressController = TextEditingController();
 
   bool agree = false;
@@ -203,6 +204,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           return null;
                         },
                       ),
+                      _buildTextFormField(
+                        label: "Xác nhận mật khẩu *",
+                        controller: _confirmPasswordController,
+                        isPassword: true,
+                        suffix: IconButton(
+                          icon: Icon(obscurePass ? Icons.visibility_off : Icons.visibility),
+                          onPressed: () => setState(() => obscurePass = !obscurePass),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "Vui lòng xác nhận mật khẩu.";
+                          }
+                          if (value.trim() != _passwordController.text.trim()) {
+                            return "Mật khẩu xác nhận không khớp.";
+                          }
+                          return null;
+                        },
+                      ),
+
                       Row(
                         children: [
                           Checkbox(
