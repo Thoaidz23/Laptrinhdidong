@@ -24,6 +24,7 @@ dependencies:
 
   font_awesome_flutter: ^10.7.0 # ← thêm dòng này
   html: ^0.15.6
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:

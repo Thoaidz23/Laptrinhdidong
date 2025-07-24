@@ -4,7 +4,7 @@ include 'db.php';
 $data = json_decode(file_get_contents("php://input"));
 $name = $data->name;
 $email = $data->email;
-$password = $data->password;
+$password = password_hash($data->password, PASSWORD_DEFAULT);
 $phone = $data->phone ?? '';
 $address = $data->address ?? '';
 
@@ -18,7 +18,7 @@ if ($result->num_rows > 0) {
     ]);
 } else {
     $sql = "INSERT INTO tbl_user (name, email, password, phone, address, role)
-            VALUES ('$name', '$email', '$password', '$phone', '$address',3)";
+            VALUES ('$name', '$email', '$password', '$phone', '$address', 3)";
     if ($conn->query($sql) === TRUE) {
         echo json_encode([
             'status' => true,
@@ -27,9 +27,8 @@ if ($result->num_rows > 0) {
     } else {
         echo json_encode([
             'status' => false,
-            'message' => 'Lỗi server: ' . $conn->error // thêm lỗi chi tiết
+            'message' => 'Lỗi server: ' . $conn->error
         ]);
     }
-
 }
 ?>

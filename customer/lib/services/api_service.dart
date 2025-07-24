@@ -196,6 +196,33 @@ class ApiService {
     });
   }
 
+  static Future<List<Order>> fetchOrdersFromApi(int userId) async {
+    final url = Uri.parse('$baseUrl/api_order.php'); // Đổi lại nếu file bạn khác tên
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'id_user': userId}),
+    );
+
+    print("📦 fetchOrdersFromApi response: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      if (data['status'] == true && data['orders'] != null) {
+        List ordersJson = data['orders'];
+        return ordersJson.map((e) => Order.fromJson(e)).toList();
+      } else {
+        print("❌ Lỗi khi lấy đơn hàng: ${data['message']}");
+        return [];
+      }
+    } else {
+      throw Exception('❗ Lỗi kết nối server khi lấy đơn hàng');
+    }
+  }
+
+
   static Future<List<FooterItem>> fetchFooterItems() async {
     final response = await http.get(Uri.parse('$baseUrl/get_about.php'));
     if (response.statusCode == 200) {
