@@ -4,33 +4,38 @@ import '../model/product.dart';
 import 'product_detail_screen.dart';
 import '../services/api_service.dart';
 import 'package:html/parser.dart' as html_parser;
+import '../Widget/MenuBar.dart';
 
 class CategoryScreen extends StatefulWidget {
-  const CategoryScreen({super.key});
+  final String? selectedCategoryName;
+  const CategoryScreen({super.key, this.selectedCategoryName});
 
   @override
   State<CategoryScreen> createState() => _CategoryScreenState();
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
+
   List<Product> products = [];
   bool isLoading = true;
 
   final List<Map<String, dynamic>> categories = [
     {'id': 0, 'name': 'Tất cả'},
     {'id': 1, 'name': 'Snack'},
-    {'id': 2, 'name': 'Cake'},
+    {'id': 2, 'name': 'Bánh'},
     {'id': 3, 'name': 'Kẹo'},
-    {'id': 4, 'name': 'Thức ăn đóng hộp'},
+    {'id': 4, 'name': 'Thức uống đóng hộp'},
     {'id': 5, 'name': 'Đồ ăn đóng hộp'},
     {'id': 6, 'name': 'Đồ ăn liền'},
   ];
 
   int selectedCategoryId = 0;
 
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
     if (args != null && args['name'] != null) {
@@ -41,6 +46,21 @@ class _CategoryScreenState extends State<CategoryScreen> {
     }
     fetchData();
   }
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.selectedCategoryName != null) {
+      final found = categories.firstWhere(
+            (c) => c['name'] == widget.selectedCategoryName,
+        orElse: () => {'id': 0},
+      );
+      selectedCategoryId = found['id'];
+    }
+
+    fetchData();
+  }
+
 
   Future<void> fetchData() async {
     setState(() => isLoading = true);
@@ -51,11 +71,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
       print("Lỗi tải sản phẩm: $e");
     } finally {
       setState(() => isLoading = false);
+
     }
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       body: Column(children: [

@@ -10,7 +10,14 @@ import '../model/user.dart';
 
 class MainScreen extends StatefulWidget {
   final int initialIndex;
-  const MainScreen({Key? key, this.initialIndex = 0}) : super(key: key);
+  final String? selectedCategoryName; // ✅ thêm dòng này
+
+  const MainScreen({
+    Key? key,
+    this.initialIndex = 0,
+    this.selectedCategoryName,
+  }) : super(key: key);
+
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -33,7 +40,7 @@ class _MainScreenState extends State<MainScreen> {
         displayedScreen = const HomeScreen();
         break;
       case 1:
-        displayedScreen = const CategoryScreen();
+        displayedScreen = CategoryScreen(selectedCategoryName: widget.selectedCategoryName);
         break;
       case 2:
           displayedScreen = const CartScreen();
@@ -42,7 +49,7 @@ class _MainScreenState extends State<MainScreen> {
           displayedScreen = const OrderHistoryScreen(); // ✅ Đổi sang màn lịch sử
         break;
       case 4:
-          displayedScreen = const MoreScreen();
+        displayedScreen = const MoreScreen();
         break;
       default:
         displayedScreen = const HomeScreen();

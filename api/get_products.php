@@ -2,11 +2,13 @@
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
+
 include_once 'db.php';
 
 $categoryId = $_GET['category_id'] ?? null;
 
 // SQL lấy sản phẩm và ảnh phụ
+
 $sql = "
     SELECT 
         p.*, 
@@ -23,6 +25,7 @@ if ($categoryId !== null && $categoryId !== '0') {
 
 $sql .= " ORDER BY p.id_product DESC";
 
+
 $result = $conn->query($sql);
 
 $products = [];
@@ -30,7 +33,6 @@ $products = [];
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $id = $row['id_product'];
-
         if (!isset($products[$id])) {
             $products[$id] = [
                 'id_product' => $row['id_product'],
@@ -53,6 +55,5 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
-// Trả mảng dạng list
 echo json_encode(array_values($products));
 ?>

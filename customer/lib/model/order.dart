@@ -61,4 +61,5 @@ class Order {
     if (rawImage.startsWith("http")) return rawImage;
     return '${ApiService.baseUrl.replaceAll("/api", "")}/adminweb/admin/quanlysanpham/uploads/$rawImage';
   }
+
 }

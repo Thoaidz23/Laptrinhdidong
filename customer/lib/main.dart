@@ -10,6 +10,10 @@ import 'screen/register_screen.dart';
 import 'model/user.dart';
 import 'services/api_service.dart';
 
+import 'provider/cart_provider.dart';
+import 'screen/category_screen.dart'; // <-- nhớ import nếu chưa có
+
+
 User? currentUser;
 
 void main() async {
@@ -36,6 +40,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
+        '/category': (context) => const CategoryScreen(), // ✅ thêm dòng này
       },
     );
   }

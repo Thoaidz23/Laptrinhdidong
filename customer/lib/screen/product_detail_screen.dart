@@ -13,7 +13,6 @@
     @override
     State<ProductDetailScreen> createState() => _ProductDetailScreenState();
   }
-
   final Map<int, String> categoryNames = {
     1: 'Snack',
     2: 'Bánh',
@@ -22,6 +21,7 @@
     5: 'Đồ ăn đóng hộp',
     6: 'Đồ ăn liền',
   };
+
 
   class _ProductDetailScreenState extends State<ProductDetailScreen> {
     late List<String> imageUrls;
@@ -50,10 +50,6 @@
 
       _pageController = PageController(initialPage: _currentPage);
     }
-
-
-
-
 
     void _goToPage(int index) {
       int nextIndex = index;

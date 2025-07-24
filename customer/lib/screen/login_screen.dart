@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../model/user.dart';
-import '../screen/home_screen.dart';
+import '../screen/main_screen.dart';
 import '../Widget/Header.dart';
 import '../Widget/MenuBar.dart';
 import 'main_screen.dart';
@@ -16,18 +16,63 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
   bool _obscurePassword = true;
-  String _errorMessage = '';
+  String _emailError = '';
+  String _passwordError = '';
+  String _loginError = '';
   int _selectedIndex = 0;
+
+  bool _validateForm(String email, String password) {
+    setState(() {
+      _emailError = '';
+      _passwordError = '';
+      _loginError = '';
+    });
+
+    final emailRegex = RegExp(r"^[\w\.-]+@[\w\.-]+\.\w{2,}$");
+    bool isValid = true;
+
+    // Email
+    if (!emailRegex.hasMatch(email)) {
+      _emailError = 'Email không đúng định dạng';
+      isValid = false;
+    } else if (email.length < 8) {
+      _emailError = 'Email phải có ít nhất 8 ký tự';
+      isValid = false;
+    } else if (email.length > 30) {
+      _emailError = 'Email không được vượt quá 30 ký tự';
+      isValid = false;
+    }
+
+    // Mật khẩu
+    if (password.length < 8) {
+      _passwordError = 'Mật khẩu phải từ 8 ký tự trở lên';
+      isValid = false;
+    } else if (password.length > 30) {
+      _passwordError = 'Mật khẩu không vượt quá 30 ký tự';
+      isValid = false;
+    } else {
+      if (!RegExp(r'\d').hasMatch(password)) {
+        _passwordError = 'Mật khẩu phải chứa ít nhất 1 số';
+        isValid = false;
+      } else if (!RegExp(r'[^A-Za-z0-9]').hasMatch(password)) {
+        _passwordError = 'Mật khẩu phải chứa ký tự đặc biệt';
+        isValid = false;
+      }
+    }
+
+
+    setState(() {}); // để hiển thị lỗi
+
+    return isValid;
+  }
 
   Future<void> _login() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
-      setState(() => _errorMessage = 'Vui lòng nhập đầy đủ thông tin');
-      return;
-    }
+    if (!_validateForm(email, password)) return;
 
     try {
       final response = await http.post(
@@ -41,22 +86,20 @@ class _LoginScreenState extends State<LoginScreen> {
         final data = jsonDecode(body);
         if (data['status'] == true) {
           currentUser = User.fromJson(data['user']);
-          Navigator.pop(context); // trở về MainScreen có MenuBar
-
+          Navigator.pop(context); // thành công → trở về
         } else {
-          setState(() => _errorMessage = data['message'] ?? 'Sai thông tin đăng nhập');
+          setState(() => _loginError = data['message'] ?? 'Sai thông tin đăng nhập');
         }
       } else {
-        setState(() => _errorMessage = 'Lỗi phản hồi từ máy chủ');
+        setState(() => _loginError = 'Lỗi phản hồi từ máy chủ');
       }
     } catch (e) {
-      setState(() => _errorMessage = 'Không thể kết nối tới server');
+      setState(() => _loginError = 'Không thể kết nối tới server');
     }
   }
 
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
-    // TODO: Chuyển trang nếu cần
   }
 
   @override
@@ -82,6 +125,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 30),
+
+                    // Email input
                     TextField(
                       controller: _emailController,
                       decoration: const InputDecoration(
@@ -89,7 +134,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         border: UnderlineInputBorder(),
                       ),
                     ),
+                    if (_emailError.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(_emailError, style: const TextStyle(color: Colors.red)),
+                      ),
+
                     const SizedBox(height: 20),
+
+                    // Password input
                     TextField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
@@ -105,6 +158,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
+                    if (_passwordError.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(_passwordError, style: const TextStyle(color: Colors.red)),
+                      ),
+
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
@@ -112,12 +171,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: const Text('Bạn quên mật khẩu?'),
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    if (_errorMessage.isNotEmpty)
+
+                    if (_loginError.isNotEmpty)
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Text(_errorMessage, style: const TextStyle(color: Colors.red)),
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Text(_loginError, style: const TextStyle(color: Colors.red)),
                       ),
+
+                    const SizedBox(height: 10),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -135,6 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 30),
                     Center(
                       child: GestureDetector(

@@ -21,29 +21,39 @@ if (empty($email) || empty($password)) {
 }
 
 // Truy vấn CSDL để kiểm tra đăng nhập
-$sql = "SELECT * FROM tbl_user WHERE email = ? AND password = ?";
+$sql = "SELECT * FROM tbl_user WHERE email = ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("ss", $email, $password);
+$stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $user = $result->fetch_assoc();
-    echo json_encode([
-        'status' => true,
-        'message' => 'Đăng nhập thành công',
-        'user' => [
-            'id_user' => (int)$user['id_user'],
-            'name' => $user['name'],
-            'email' => $user['email'],
-            'phone' => $user['phone'],
-            'address' => $user['address'],
-        ]
-    ]);
+
+    // So sánh password với password đã hash trong database
+    if (password_verify($password, $user['password'])) {
+        echo json_encode([
+            'status' => true,
+            'message' => 'Đăng nhập thành công',
+            'user' => [
+                'id_user' => (int)$user['id_user'],
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'phone' => $user['phone'],
+                'address' => $user['address'],
+            ]
+        ]);
+    } else {
+        echo json_encode([
+            'status' => false,
+            'message' => 'Email hoặc mật khẩu không đúng'
+        ]);
+    }
 } else {
     echo json_encode([
         'status' => false,
         'message' => 'Email hoặc mật khẩu không đúng'
     ]);
 }
+
 ?>
