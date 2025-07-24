@@ -22,15 +22,29 @@
 
     @override
     void initState() {
-
       super.initState();
       final product = widget.product;
-      // Nếu chỉ có 1 ảnh:
-      imageUrls = [
-        '${ApiService.baseUrl.replaceAll("/api", "")}/adminweb/admin/quanlysanpham/uploads/${product.image}'
-      ];
+
+      // ✅ In ra danh sách ảnh chi tiết để debug
+      print('📦 Sản phẩm: ${product.name}');
+      if (product.images.isNotEmpty) {
+        for (var img in product.images) {
+          print('🖼️ Ảnh chi tiết: ID = ${img.id}, URL = ${img.fullUrl}');
+        }
+      } else {
+        print('⚠️ Không có ảnh chi tiết, dùng ảnh đại diện: ${product.imageUrl}');
+      }
+
+      // ✅ Nếu có danh sách ảnh chi tiết thì dùng, không thì dùng ảnh chính
+      imageUrls = product.images.isNotEmpty
+          ? product.images.map((img) => img.fullUrl).toList()
+          : [product.imageUrl];
+
       _pageController = PageController(initialPage: _currentPage);
     }
+
+
+
 
     void _goToPage(int index) {
       int nextIndex = index;

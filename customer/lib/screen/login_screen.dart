@@ -53,10 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _passwordError = 'Mật khẩu không vượt quá 30 ký tự';
       isValid = false;
     } else {
-      if (!RegExp(r'[A-Z]').hasMatch(password)) {
-        _passwordError = 'Mật khẩu phải chứa ít nhất 1 chữ hoa';
-        isValid = false;
-      } else if (!RegExp(r'\d').hasMatch(password)) {
+      if (!RegExp(r'\d').hasMatch(password)) {
         _passwordError = 'Mật khẩu phải chứa ít nhất 1 số';
         isValid = false;
       } else if (!RegExp(r'[^A-Za-z0-9]').hasMatch(password)) {
@@ -64,6 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
         isValid = false;
       }
     }
+
 
     setState(() {}); // để hiển thị lỗi
 
