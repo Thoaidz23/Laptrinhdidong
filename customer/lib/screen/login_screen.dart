@@ -5,7 +5,7 @@ import '../model/user.dart';
 import '../screen/home_screen.dart';
 import '../Widget/Header.dart';
 import '../Widget/MenuBar.dart';
-
+import 'main_screen.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -163,7 +163,20 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        onTap: (index) {
+          setState(() => _selectedIndex = index);
+
+          if (index == 0 || index == 1 || index == 4) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => MainScreen(initialIndex: index)),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Vui lòng đăng nhập để tiếp tục')),
+            );
+          }
+        },
       ),
     );
   }

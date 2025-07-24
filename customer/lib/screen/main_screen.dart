@@ -9,15 +9,21 @@ import 'order_history_screen.dart'; // ✅ Thêm import màn lịch sử
 import '../model/user.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  final int initialIndex;
+  const MainScreen({Key? key, this.initialIndex = 0}) : super(key: key);
 
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
-
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
+  int? _pendingTabIndex;
 
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex; // ✅ lấy index ban đầu
+  }
   @override
   Widget build(BuildContext context) {
     Widget displayedScreen;
@@ -27,33 +33,13 @@ class _MainScreenState extends State<MainScreen> {
         displayedScreen = const HomeScreen();
         break;
       case 1:
-
         displayedScreen = const CategoryScreen();
-
         break;
       case 2:
-
-
-        if (currentUser == null) {
-          Future.microtask(() {
-            Navigator.pushNamed(context, '/login').then((_) => setState(() {}));
-          });
-          displayedScreen = const SizedBox.shrink();
-        } else {
-
           displayedScreen = const CartScreen();
-
-        }
         break;
       case 3:
-        if (currentUser == null) {
-          Future.microtask(() {
-            Navigator.pushNamed(context, '/login').then((_) => setState(() {}));
-          });
-          displayedScreen = const SizedBox.shrink();
-        } else {
           displayedScreen = const OrderHistoryScreen(); // ✅ Đổi sang màn lịch sử
-        }
         break;
       case 4:
           displayedScreen = const MoreScreen();
@@ -67,6 +53,19 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavBar(
         currentIndex: _currentIndex,
         onTap: (index) {
+          if ((index == 2 || index == 3) && currentUser == null) {
+            _pendingTabIndex = index;
+            Navigator.pushNamed(context, '/login').then((_) {
+              if (currentUser != null && _pendingTabIndex != null) {
+                setState(() {
+                  _currentIndex = _pendingTabIndex!;
+                  _pendingTabIndex = null;
+                });
+              }
+            });
+            return;
+          }
+          // ✅ Các tab khác thì đổi bình thường
           setState(() {
             _currentIndex = index;
           });

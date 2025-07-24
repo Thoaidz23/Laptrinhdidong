@@ -19,28 +19,34 @@ class ApiService {
         String ip = data['ip'];
         baseUrl = "http://$ip/ttsfood/api";
         print(">>> New baseUrl: $baseUrl");
+
       }
     } catch (e) {
       print(">>> Failed to fetch IP, using default: $e");
     }
   }
 
-  static Future<List<Product>> fetchProducts() async {
-    final response = await http.get(Uri.parse("$baseUrl/get_products.php"));
-    print(">>> Product API response: ${response.body}");
+  static Future<List<Product>> fetchProducts({int? categoryId}) async {
+    try {
+      final url = categoryId != null
+          ? "$baseUrl/get_products.php?category_id=$categoryId"
+          : "$baseUrl/get_products.php";
 
-    if (response.statusCode == 200) {
-      try {
+      final response = await http.get(Uri.parse(url));
+      print(">>> Product API response: ${response.body}");
+
+      if (response.statusCode == 200) {
         final List data = json.decode(response.body);
         return data.map((e) => Product.fromJson(e)).toList();
-      } catch (e) {
-        print(">>> JSON Decode Error: $e");
-        throw Exception("Invalid JSON format");
+      } else {
+        throw Exception("Lỗi server: ${response.statusCode}");
       }
-    } else {
-      throw Exception("Failed to load products");
+    } catch (e) {
+      print("Lỗi khi tải sản phẩm: $e");
+      throw Exception("Không thể tải sản phẩm");
     }
   }
+
 
   Future<List<Product>> fetchProductsByCategory(int idCategory) async {
     final response = await http.get(Uri.parse('$baseUrl/product_by_category.php?id=$idCategory'));
@@ -99,13 +105,23 @@ class ApiService {
 
   static Future<List<Order>> fetchOrders(int userId) async {
     final response = await http.get(Uri.parse("$baseUrl/get_user_orders.php?user_id=$userId"));
+
+    print("PHẢN HỒI: ${response.body}");
+
     if (response.statusCode == 200) {
-      final List data = json.decode(response.body);
-      return data.map((e) => Order.fromJson(e)).toList();
+      try {
+        final List data = json.decode(response.body);
+        return data.map((e) => Order.fromJson(e)).toList();
+      } catch (e) {
+        print("Lỗi decode JSON: $e");
+        throw Exception("Dữ liệu không đúng định dạng JSON");
+      }
     } else {
-      throw Exception("Failed to load orders");
+      throw Exception("Không thể tải đơn hàng");
     }
+
   }
+
 
   static Future<bool> addToCart(int userId, int productId, int quantity, double price) async {
     final response = await http.post(
@@ -231,7 +247,6 @@ class ApiService {
     }
   }
 
-
   static Future<bool> updateUser(User user) async {
     final response = await http.post(
       Uri.parse('$baseUrl/update_user.php'),
@@ -245,4 +260,60 @@ class ApiService {
     );
     return response.statusCode == 200 && response.body.contains('success');
   }
+
+  Future<double?> _convertVNDToUSD(double vndAmount) async {
+    const double vndPerEur = 27000; // Bạn có thể thay đổi tỉ lệ này nếu muốn động hơn
+    final double eurAmount = vndAmount / vndPerEur;
+
+    try {
+      final url = Uri.parse('https://api.frankfurter.app/latest?amount=$eurAmount&from=EUR&to=USD');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final usdAmount = data['rates']['USD'];
+        return usdAmount.toDouble();
+      } else {
+        throw Exception("Failed to convert currency");
+      }
+    } catch (e) {
+      print("Currency conversion error: $e");
+      return null;
+    }
+  }
+
+  Future<void> startPaypalPayment(double vndAmount) async {
+    // Convert sang USD
+    double? usdAmount = await _convertVNDToUSD(vndAmount);
+
+    if (usdAmount == null) {
+      print("❌ Không thể chuyển đổi tiền tệ");
+      return;
+    }
+
+    print("💵 USD Amount to send: $usdAmount");
+
+    final response = await http.post(
+      Uri.parse("http://10.0.2.2/ttsfood/api/create-payment.php"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"amount": usdAmount}),
+    );
+
+    print("📦 Response: ${response.body}");
+
+    final data = jsonDecode(response.body);
+
+    if (data['approvalUrl'] != null) {
+      final approvalUrl = data['approvalUrl'];
+
+      // TODO: mở WebView tại đây
+      print("✅ Open PayPal URL: $approvalUrl");
+
+    } else {
+      print("❌ Lỗi tạo payment: ${data['error']}");
+    }
+  }
+
+
+
 }

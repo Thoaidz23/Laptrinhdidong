@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
+import 'dart:io';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
+
 import 'screen/main_screen.dart';
 import 'screen/login_screen.dart';
 import 'screen/register_screen.dart';
 import 'model/user.dart';
 import 'services/api_service.dart';
-import 'provider/cart_provider.dart';
 
 User? currentUser;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await ApiService.fetchBaseUrl(); // lấy IP từ get_ip.php nếu có
+  await ApiService.fetchBaseUrl();
+
 
   runApp(const MyApp());
 }
