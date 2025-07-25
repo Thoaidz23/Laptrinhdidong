@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../Widget/Header.dart';
-import '../services/api_service.dart';
 import '../model/user.dart';
+import '../screen/changePassword.dart';
+import '../services/api_service.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -21,19 +22,18 @@ class _AccountPageState extends State<AccountPage> {
   @override
   void initState() {
     super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
     if (currentUser == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacementNamed(context, '/login');
       });
-    } else {
-      _loadUserData();
+      return;
     }
-  }
 
-  Future<void> _loadUserData() async {
     final user = await ApiService().fetchUserById(currentUser!.id);
-
-
     if (user != null) {
       currentUser = user;
       setState(() {
@@ -44,11 +44,9 @@ class _AccountPageState extends State<AccountPage> {
         isLoading = false;
       });
     } else {
-      setState(() {
-        isLoading = false;
-      });
+      setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Không tìm thấy người dùng.")),
+        const SnackBar(content: Text("Không thể tải thông tin người dùng")),
       );
     }
   }
@@ -65,25 +63,54 @@ class _AccountPageState extends State<AccountPage> {
     );
 
     final success = await ApiService.updateUser(updatedUser);
+    if (!mounted) return;
 
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(success
-              ? 'Cập nhật thành công'
-              : 'Cập nhật thất bại. Vui lòng thử lại.'),
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(success ? 'Cập nhật thành công' : 'Cập nhật thất bại'),
+      ),
+    );
+  }
+
+  void _changePassword() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ChangePasswordPage()),
+    );
+  }
+
+  void _lockAccount() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Tính năng đang phát triển")),
+    );
+  }
+
+  void _confirmLogout() {
+    showDialog(
+      context: context,
+      builder: (context) => Center(
+        child: AlertDialog(
+          title: const Text('Xác nhận đăng xuất'),
+          content: const Text('Bạn có chắc chắn muốn đăng xuất?'),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() => currentUser = null);
+                Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+              },
+              child: const Text('Có'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Không'),
+            ),
+          ],
         ),
-      );
-    }
+      ),
+    );
   }
-
-  void _logout() {
-    setState(() {
-      currentUser = null;
-    });
-    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +120,7 @@ class _AccountPageState extends State<AccountPage> {
         children: [
           const Header(),
 
-          // Thanh tiêu đề
+          // Tiêu đề
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -107,9 +134,7 @@ class _AccountPageState extends State<AccountPage> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+                  onPressed: () => Navigator.pop(context),
                 ),
                 const Expanded(
                   child: Center(
@@ -124,104 +149,185 @@ class _AccountPageState extends State<AccountPage> {
             ),
           ),
 
-          // Nội dung
+          // Nội dung chính
           Expanded(
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 6,
-                        offset: Offset(0, 2),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Tài khoản',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextField(
-                        controller: nameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Họ và tên *',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: phoneController,
-                        keyboardType: TextInputType.phone,
-                        decoration: const InputDecoration(
-                          labelText: 'Số điện thoại *',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(
-                          labelText: 'Email',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: addressController,
-                        decoration: const InputDecoration(
-                          labelText: 'Địa chỉ',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Center(
-                        child: Text(
-                          '${nameController.text} có thể chỉnh sửa thông tin tại đây:',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: _saveChanges,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                          ),
-                          child: const Text('Chỉnh sửa'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
+                    ),
+                    const SizedBox(height: 12),
 
-          // Nút đăng xuất
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _logout,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  'Đăng xuất',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
+                    // Form thông tin người dùng
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: nameController,
+                            decoration: const InputDecoration(
+                              labelText: 'Họ và tên',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          TextField(
+                            controller: phoneController,
+                            decoration: const InputDecoration(
+                              labelText: 'Số điện thoại',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          TextField(
+                            controller: emailController,
+                            decoration: const InputDecoration(
+                              labelText: 'Email',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          TextField(
+                            controller: addressController,
+                            decoration: const InputDecoration(
+                              labelText: 'Địa chỉ',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: _saveChanges,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                              ),
+                              child: const Text('Lưu thay đổi'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    const Text(
+                      'Bảo mật',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Các tùy chọn bảo mật
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          InkWell(
+                            onTap: _changePassword,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: const BoxDecoration(
+                                border: Border(bottom: BorderSide(color: Colors.black12)),
+                              ),
+                              child: Row(
+                                children: const [
+                                  Icon(Icons.lock_reset, size: 28),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      'Đổi mật khẩu',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                  Icon(Icons.chevron_right),
+                                ],
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: _lockAccount,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: const BoxDecoration(
+                                border: Border(bottom: BorderSide(color: Colors.black12)),
+                              ),
+                              child: Row(
+                                children: const [
+                                  Icon(Icons.lock_outline, size: 28),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      'Khoá tài khoản',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                  Text(
+                                    'Đang tắt',
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                  Icon(Icons.chevron_right),
+                                ],
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: _confirmLogout,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              child: Row(
+                                children: const [
+                                  Icon(Icons.logout, size: 28, color: Colors.red),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      'Đăng xuất',
+                                      style: TextStyle(fontSize: 16, color: Colors.red),
+                                    ),
+                                  ),
+                                  Icon(Icons.chevron_right, color: Colors.red),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
