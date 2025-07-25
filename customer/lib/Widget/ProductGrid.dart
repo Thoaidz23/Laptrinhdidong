@@ -97,7 +97,7 @@ class _ProductGridState extends State<ProductGrid> {
                           const SizedBox(height: 4),
                           Text(
                             '${product.price.toStringAsFixed(0)} đ',
-                            style: const TextStyle(color: Colors.orange),
+                            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),

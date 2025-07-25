@@ -1,8 +1,13 @@
 <?php
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
-include_once 'db.php'; // Kết nối CSDL
+
+include_once 'db.php';
+
+$categoryId = $_GET['category_id'] ?? null;
+
+// SQL lấy sản phẩm và ảnh phụ
 
 $sql = "
     SELECT 
@@ -13,15 +18,21 @@ $sql = "
     LEFT JOIN tbl_product_images pi ON p.id_product = pi.id_product
 ";
 
+// Nếu có truyền category_id và khác 0 → thêm điều kiện lọc
+if ($categoryId !== null && $categoryId !== '0') {
+    $sql .= " WHERE p.id_category_product = " . intval($categoryId);
+}
+
+$sql .= " ORDER BY p.id_product DESC";
+
+
 $result = $conn->query($sql);
 
 $products = [];
 
-if ($result->num_rows > 0) {
+if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $id = $row['id_product'];
-
-        // Nếu sản phẩm chưa có trong mảng, thêm mới
         if (!isset($products[$id])) {
             $products[$id] = [
                 'id_product' => $row['id_product'],
@@ -29,13 +40,12 @@ if ($result->num_rows > 0) {
                 'price' => $row['price'],
                 'quantity' => $row['quantity'],
                 'content' => $row['content'],
-                'image' => $row['image'], // ảnh đại diện
+                'image' => $row['image'],
                 'id_category_product' => $row['id_category_product'],
-                'images' => [] // mảng chứa ảnh phụ
+                'images' => []
             ];
         }
 
-        // Nếu có ảnh phụ, thêm vào mảng
         if (!empty($row['id_product_images']) && !empty($row['image_name'])) {
             $products[$id]['images'][] = [
                 'id_product_images' => $row['id_product_images'],
@@ -45,6 +55,5 @@ if ($result->num_rows > 0) {
     }
 }
 
-// Trả về dạng danh sách
 echo json_encode(array_values($products));
 ?>

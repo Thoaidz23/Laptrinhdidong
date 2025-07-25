@@ -5,6 +5,8 @@
   import '../widget/header.dart';
   import '../services/api_service.dart';
   import '../model/user.dart';
+  import '../model/cart_item.dart';
+  import 'payment_screen.dart';
 
   class ProductDetailScreen extends StatefulWidget {
     final Product product;
@@ -13,6 +15,15 @@
     @override
     State<ProductDetailScreen> createState() => _ProductDetailScreenState();
   }
+  final Map<int, String> categoryNames = {
+    1: 'Snack',
+    2: 'Bánh',
+    3: 'Kẹo',
+    4: 'Thức uống đóng hộp',
+    5: 'Đồ ăn đóng hộp',
+    6: 'Đồ ăn liền',
+  };
+
 
   class _ProductDetailScreenState extends State<ProductDetailScreen> {
     late List<String> imageUrls;
@@ -25,26 +36,22 @@
       super.initState();
       final product = widget.product;
 
-      // ✅ In ra danh sách ảnh chi tiết để debug
       print('📦 Sản phẩm: ${product.name}');
+      print('🖼️ Ảnh đại diện: ${product.imageUrl}');
       if (product.images.isNotEmpty) {
         for (var img in product.images) {
           print('🖼️ Ảnh chi tiết: ID = ${img.id}, URL = ${img.fullUrl}');
         }
-      } else {
-        print('⚠️ Không có ảnh chi tiết, dùng ảnh đại diện: ${product.imageUrl}');
       }
 
-      // ✅ Nếu có danh sách ảnh chi tiết thì dùng, không thì dùng ảnh chính
-      imageUrls = product.images.isNotEmpty
-          ? product.images.map((img) => img.fullUrl).toList()
-          : [product.imageUrl];
+      // ✅ Thêm ảnh đại diện vào đầu, rồi nối ảnh chi tiết
+      imageUrls = [
+        product.imageUrl,
+        ...product.images.map((img) => img.fullUrl),
+      ];
 
       _pageController = PageController(initialPage: _currentPage);
     }
-
-
-
 
     void _goToPage(int index) {
       int nextIndex = index;
@@ -81,6 +88,7 @@
           children: [
             const Header(),
             const SizedBox(height: 10),
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0),
               child: Row(
@@ -92,9 +100,9 @@
                     },
                   ),
                   const SizedBox(width: 4),
-                  const Text(
-                    "Rau củ",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  Text(
+                    categoryNames[product.id_category_product] ?? 'Danh mục',
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -182,7 +190,7 @@
                         Text(
                           '${product.price.toStringAsFixed(0)}đ',
                           style:
-                          const TextStyle(fontSize: 25, color: Colors.green),
+                          const TextStyle(fontSize: 25, color: Colors.red, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -314,14 +322,38 @@
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Mua ngay thành công (demo)')),
+                    final userId = currentUser?.id;
+
+                    if (userId == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Vui lòng đăng nhập để tiếp tục')),
+                      );
+                      return;
+                    }
+
+                    // Tạo một đối tượng CartItem tạm
+                    final tempCartItem = CartItem(
+                      idCart: 0, // Không cần thiết vì chưa lưu DB
+                      idUser: userId,
+                      idProduct: widget.product.id,
+                      quantity: _quantity,
+                      price: widget.product.price,
+                      name: widget.product.name,
+                      image: widget.product.image, // hoặc widget.product.imageUrl gốc nếu khác
+                    );
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PaymentScreen(cartItems: [tempCartItem]),
+                      ),
                     );
                   },
+
                   label: const Text('Mua ngay',
                       style: TextStyle(fontSize: 18, color: Colors.white)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
+                    backgroundColor: Colors.red,
                     padding: const EdgeInsets.symmetric(vertical: 18), // 👈 to hơn
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),

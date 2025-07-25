@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../Widget/Header.dart';
 import '../model/order.dart';
 import '../services/api_service.dart';
+import '../Widget/Header.dart';
 import '../model/user.dart';
+import 'order_detail_screen.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen({super.key});
@@ -14,59 +15,36 @@ class OrderHistoryScreen extends StatefulWidget {
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   final List<String> statuses = const [
     'Tất cả',
-    'Đã giao',
-    'Đang vận chuyển',
-    'Đã hủy',
-    'Đã xác nhận',
     'Chờ xác nhận',
+    'Đã xác nhận',
+    'Đang vận chuyển',
+    'Đã giao',
+    'Đã hủy',
   ];
 
-  List<Order> orders = [];
   String selectedStatus = 'Tất cả';
+  List<Order> orders = [];
   bool isLoading = true;
-
-  User? currentUser; // bạn cần gán currentUser từ hệ thống của bạn
 
   @override
   void initState() {
     super.initState();
-    // Gán currentUser từ nơi lưu trữ trong app bạn
-    // currentUser = AuthService.currentUser; // ví dụ
-    fetchOrders();
+    loadOrders();
   }
 
-  Future<void> fetchOrders() async {
-    if (currentUser == null) {
-      print('❌ Không có người dùng hiện tại');
-      setState(() => isLoading = false);
-      return;
-    }
-
+  Future<void> loadOrders() async {
     try {
-      List<Order> fetchedOrders =
-      await ApiService.fetchOrdersFromApi(currentUser!.id);
+      int userId = currentUser?.id ?? 0;
+      List<Order> data = await ApiService.fetchOrders(userId);
       setState(() {
-        orders = fetchedOrders;
+        orders = data;
         isLoading = false;
       });
     } catch (e) {
-      print('❌ Lỗi khi tải đơn hàng: $e');
-      setState(() => isLoading = false);
-    }
-  }
-
-  String _statusToText(int status) {
-    switch (status) {
-      case 1:
-        return 'Đã giao';
-      case 2:
-        return 'Đang vận chuyển';
-      case 3:
-        return 'Đã hủy';
-      case 4:
-        return 'Đã xác nhận';
-      default:
-        return 'Chờ xác nhận';
+      print("Lỗi khi tải đơn hàng: $e");
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -87,10 +65,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             ),
             child: Row(
               children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
-                ),
+                const SizedBox(height: 20, width: 50,),
                 const Expanded(
                   child: Center(
                     child: Text(
@@ -108,7 +83,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             ),
           ),
 
-          // Lọc trạng thái
+          // Thanh chọn trạng thái
           Container(
             height: 42,
             margin: const EdgeInsets.only(top: 8),
@@ -127,12 +102,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: Colors.transparent,
                         border: Border(
                           bottom: BorderSide(
-                            color: isActive
-                                ? Colors.deepOrange
-                                : Colors.transparent,
+                            color: isActive ? Colors.deepOrange : Colors.transparent,
                             width: 2,
                           ),
                         ),
@@ -143,8 +115,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         style: TextStyle(
                           color: isActive ? Colors.red : Colors.black,
                           fontSize: 13,
-                          fontWeight:
-                          isActive ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
                     ),
@@ -167,40 +138,74 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               itemCount: orders.length,
               itemBuilder: (context, index) {
                 final order = orders[index];
-                final statusText = _statusToText(order.status);
 
                 if (selectedStatus != 'Tất cả' &&
-                    selectedStatus != statusText) {
+                    order.status != selectedStatus) {
                   return const SizedBox.shrink();
                 }
 
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 6,
-                        offset: Offset(0, 2),
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => OrderDetailScreen(order: order),
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Mã đơn: ${order.id}",
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16)),
-                      const SizedBox(height: 4),
-                      Text("Ngày mua: ${order.orderDate}"),
-                      Text("Tổng tiền: ${order.totalPrice}đ",
-                          style: const TextStyle(color: Colors.green)),
-                      Text("Trạng thái: $statusText"),
-                    ],
+                    );
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 6,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            order.image,
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Mã đơn: ${order.id}",
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16)),
+                              const SizedBox(height: 4),
+                              Text(
+                                  "Ngày mua: ${order.date} lúc ${order.time}"),
+                              Text("Tổng tiền: ${order.total}đ",
+                                  style: const TextStyle(
+                                      color: Colors.green)),
+                              Text(
+                                  "Thanh toán: ${order.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}",
+                                  style: TextStyle(
+                                      color: order.isPaid
+                                          ? Colors.green
+                                          : Colors.red)),
+                              Text("Trạng thái: ${order.status}"),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -208,6 +213,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           ),
         ],
       ),
+
     );
   }
 }

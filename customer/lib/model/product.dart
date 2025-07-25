@@ -40,6 +40,7 @@ class Product {
   // ảnh đại diện
   String get imageUrl =>
       '${ApiService.baseUrl.replaceAll("/api", "")}/adminweb/admin/quanlysanpham/uploads/$image';
+
 }
 
 // Model ảnh phụ (ảnh chi tiết)

@@ -1,13 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import '../screen/main_screen.dart';
 class CategorySection extends StatefulWidget {
   const CategorySection({super.key});
 
   @override
   State<CategorySection> createState() => _CategorySectionState();
 }
+final Map<int, String> categoryNames = {
+  1: 'Snack',
+  2: 'Bánh',
+  3: 'Kẹo',
+  4: 'Thức uống đóng hộp',
+  5: 'Đồ ăn đóng hộp',
+  6: 'Đồ ăn liền',
+};
+int? getCategoryIdFromName(String name) {
+  final input = name.trim().toLowerCase(); // 👈 chuẩn hóa chuỗi
+  return categoryNames.entries
+      .firstWhere(
+        (entry) => entry.value.toLowerCase() == input,
+    orElse: () => const MapEntry(0, ''),
+  )
+      .key;
+}
+
 
 class _CategorySectionState extends State<CategorySection> {
   List<dynamic> categories = [];
@@ -85,16 +103,32 @@ class _CategorySectionState extends State<CategorySection> {
     borderRadius: BorderRadius.circular(12),
     ),
     child: InkWell(
-    onTap: () {
-    Navigator.pushNamed(
-    context,
-    '/category',
-    arguments: {
-    'id': category['id'],       // truyền id danh mục
-    'name': category['name'],   // truyền tên danh mục
-    },
-    );
-    },child: Column(
+      onTap: () {
+        int id = getCategoryIdFromName(category['name']) ?? 0;
+
+        // Nếu không tìm thấy ID, chuyển sang Đồ ăn liền (id = 6)
+        if (id == 0) {
+          id = 6;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Không tìm thấy danh mục, chuyển sang Đồ ăn liền')),
+          );
+        }
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => MainScreen(
+              initialIndex: 1,
+              selectedCategoryName: category['name'], // ✅ truyền tên danh mục
+            ),
+          ),
+        );
+
+
+      },
+
+
+      child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(icon, color: Colors.orange, size: 30),
