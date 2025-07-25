@@ -190,6 +190,18 @@ class ApiService {
     return data['status'] == 'success';
   }
 
+  Future<Map<String, dynamic>?> fetchOrderDetail(String codeOrder) async {
+    final response = await http.get(Uri.parse('$baseUrl/get_order_detail.php?code_order=$codeOrder'));
+    print('RESPONSE BODY: ${response.body}');
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['status'] == true) {
+        return data;
+      }
+    }
+    return null;
+  }
+
 
   static Future<List<CartItem>> getCart(int userId) async {
     final response = await http.get(Uri.parse('$baseUrl/get_cart.php?id_user=$userId'));

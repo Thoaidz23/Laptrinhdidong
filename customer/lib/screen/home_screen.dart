@@ -23,24 +23,23 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           const Header(), // ✅ Luôn nằm trên cùng
 
-
           Expanded(
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 🔍 Thanh tìm kiếm
-                  Container(
-                    color: Colors.red,
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
                           'Bạn muốn ăn gì nào?',
                           style: TextStyle(
-                            fontSize: 18,fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -80,7 +79,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-
 
                   const BannerSlider(),
                   const SizedBox(height: 20),

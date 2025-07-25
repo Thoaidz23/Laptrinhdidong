@@ -8,7 +8,12 @@ class Order {
   final int total;
   final String image;
   final String item;
-  final bool isPaid; // mới thêm
+  final bool isPaid;
+
+  // 👇 Bổ sung các trường từ backend
+  final String name;
+  final String phone;
+  final String address;
 
   Order({
     required this.id,
@@ -19,6 +24,9 @@ class Order {
     required this.image,
     required this.item,
     required this.isPaid,
+    required this.name,
+    required this.phone,
+    required this.address,
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
@@ -36,9 +44,11 @@ class Order {
       image: buildImageUrl(json['image'] ?? ''),
       item: json['item'] ?? '',
       isPaid: (int.tryParse(json['paystatus']?.toString() ?? '0') ?? 0) == 1,
+      name: json['name_user'] ?? '',
+      phone: json['phone'] ?? '',
+      address: json['address'] ?? '',
     );
   }
-
 
   static String parseStatus(dynamic status) {
     switch (status.toString()) {
@@ -61,5 +71,4 @@ class Order {
     if (rawImage.startsWith("http")) return rawImage;
     return '${ApiService.baseUrl.replaceAll("/api", "")}/adminweb/admin/quanlysanpham/uploads/$rawImage';
   }
-
 }

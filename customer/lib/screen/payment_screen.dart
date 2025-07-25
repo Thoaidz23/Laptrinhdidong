@@ -6,7 +6,6 @@ import '../model/cart_item.dart';
 import '../model/user.dart';
 import '../services/api_service.dart';
 import 'paypal_payment_screen.dart';
-import 'order_history_screen.dart';
 import 'main_screen.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -21,41 +20,46 @@ class PaymentScreen extends StatefulWidget {
 class _PaymentScreenState extends State<PaymentScreen> {
   String? _selectedMethod;
 
+  late TextEditingController _nameController;
+  late TextEditingController _phoneController;
+  late TextEditingController _addressController;
+
+  @override
+  void initState() {
+    super.initState();
+    final user = currentUser!;
+    _nameController = TextEditingController(text: user.name);
+    _phoneController = TextEditingController(text: user.phone);
+    _addressController = TextEditingController(text: user.address);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    super.dispose();
+  }
+
   double _getTotalVND() {
-    return widget.cartItems.fold(
-      0.0,
-          (sum, item) => sum + item.price * item.quantity,
-    );
+    return widget.cartItems.fold(0.0, (sum, item) => sum + item.price * item.quantity);
   }
 
   Future<double?> _convertVNDToUSD(double vndAmount) async {
-    const apiKey = "9d18cee183b9ecf318d5eb21"; // 🔁 Thay bằng API key của bạn
+    const apiKey = "9d18cee183b9ecf318d5eb21"; // Replace with your real API key
     final formattedAmount = vndAmount.toStringAsFixed(2);
-    final url = Uri.parse(
-        'https://v6.exchangerate-api.com/v6/$apiKey/pair/VND/USD/$formattedAmount');
+    final url = Uri.parse('https://v6.exchangerate-api.com/v6/$apiKey/pair/VND/USD/$formattedAmount');
 
     try {
       final response = await http.get(url);
-
-      if (response.statusCode != 200) {
-        print("API lỗi: ${response.statusCode} - ${response.body}");
-        return null;
-      }
+      if (response.statusCode != 200) return null;
 
       final data = json.decode(response.body);
-      if (data['conversion_result'] == null) {
-        print("Không có kết quả: $data");
-        return null;
-      }
-
       return (data['conversion_result'] as num).toDouble();
     } catch (e) {
-      print("Currency conversion error: $e");
       return null;
     }
   }
-
-
 
   Future<void> _orderNow() async {
     if (_selectedMethod == null) {
@@ -73,8 +77,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
     } else if (_selectedMethod == "paypal") {
       await _handlePaypalPayment();
     } else if (_selectedMethod == "momo") {
+      // TODO: Handle MoMo integration
     } else {
-      await _createOrderOnServer(); // cod
+      await _createOrderOnServer();
     }
   }
 
@@ -98,7 +103,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-
   Future<void> _createOrderOnServer() async {
     final url = Uri.parse('${ApiService.baseUrl}/create_order.php');
 
@@ -108,35 +112,29 @@ class _PaymentScreenState extends State<PaymentScreen> {
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           "id_user": currentUser!.id,
-          "name_user": currentUser!.name,
-          "address": currentUser!.address,
-          "phone": currentUser!.phone,
-          "method": _selectedMethod,
+          "name_user": _nameController.text.trim(),
+          "address": _addressController.text.trim(),
+          "phone": _phoneController.text.trim(),
+          "method": _selectedMethod == "bank" ? 1 : 0,
           "cart": widget.cartItems.map((item) => {
             "id_product": item.idProduct,
             "quantity": item.quantity,
             "price": item.price,
           }).toList(),
-          "isBuyNow": widget.cartItems.length == 1 && widget.cartItems.first.idCart == 0, // 👈 Mẹo phân biệt
+          "isBuyNow": widget.cartItems.length == 1 && widget.cartItems.first.idCart == 0,
         }),
-
       );
 
       final result = json.decode(response.body);
       if (result['status'] == true) {
         _showSnack("Đặt hàng thành công");
-
-        // Chờ một chút để hiện snackbar xong mới chuyển
         await Future.delayed(const Duration(seconds: 1));
-
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (_) => const MainScreen(initialIndex: 3)),
               (route) => false,
         );
-
-      }
-      else {
+      } else {
         _showSnack("Lỗi: ${result['message']}");
       }
     } catch (e) {
@@ -157,7 +155,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             const Text('Số tài khoản: 0123456789'),
             const Text('Chủ tài khoản: NGUYEN VAN A'),
             const SizedBox(height: 8),
-            Text('Nội dung: Thanh toán - ${currentUser?.name ?? ""}'),
+            Text('Nội dung: Thanh toán - ${_nameController.text}'),
           ],
         ),
         actions: [
@@ -220,8 +218,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Thông tin sản phẩm",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text("Thông tin sản phẩm", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   sectionContainer(
                     child: Column(
@@ -244,8 +241,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(item.name,
-                                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                                    Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                                     Text("SL: ${item.quantity}"),
                                     Text("Giá: ${item.price}đ"),
                                   ],
@@ -258,29 +254,30 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text("Thông tin khách hàng",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text("Thông tin khách hàng", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   sectionContainer(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Họ tên: ${user.name}"),
-                        Text("SĐT: ${user.phone}"),
-                        const SizedBox(height: 4),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(child: Text("Địa chỉ: ${user.address}")),
-                            const Icon(Icons.edit, size: 20, color: Colors.grey),
-                          ],
+                        TextField(
+                          controller: _nameController,
+                          decoration: const InputDecoration(labelText: 'Họ tên'),
+                        ),
+                        TextField(
+                          controller: _phoneController,
+                          keyboardType: TextInputType.phone,
+                          decoration: const InputDecoration(labelText: 'SĐT'),
+                        ),
+                        TextField(
+                          controller: _addressController,
+                          decoration: const InputDecoration(labelText: 'Địa chỉ'),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text("Phương thức thanh toán",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text("Phương thức thanh toán", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   sectionContainer(
                     child: Column(
