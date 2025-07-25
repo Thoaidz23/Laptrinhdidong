@@ -87,26 +87,45 @@
         body: Column(
           children: [
             const Header(),
-            const SizedBox(height: 10),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0),
+
+            Container(
+              width: double.infinity,
+              color: Colors.orange,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        categoryNames[product.id_category_product] ?? 'Danh mục',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    categoryNames[product.id_category_product] ?? 'Danh mục',
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  IconButton(
+                    icon: const Icon(Icons.shopping_cart, color: Colors.white),
+                    onPressed: () {
+                      // 👉 Nếu muốn chuyển đến trang giỏ hàng, thêm lệnh điều hướng ở đây
+                      // Navigator.push(context, MaterialPageRoute(builder: (_) => CartScreen()));
+                    },
                   ),
                 ],
               ),
             ),
+
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,

@@ -95,24 +95,23 @@ class _AccountPageState extends State<AccountPage> {
     showDialog(
         context: context,
         builder: (context) => Center(
-      child: AlertDialog(
-          title: const Text('Xác nhận đăng xuất'),
-          content: const Text('Bạn có chắc chắn muốn đăng xuất?'),
-          actionsAlignment: MainAxisAlignment.spaceBetween,
-          actions: [
-          TextButton(
-          onPressed: () {
-    Navigator.of(context).pop();
-    setState(() => currentUser = null);
-    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
-    },
-      child: const Text('Có'),
-    ),
-    TextButton(onPressed: () => Navigator.of(context).pop(),
-      child: const Text('Không'),
-    ),
-          ],
-      ),
+          child: AlertDialog(
+              title: const Text('Xác nhận đăng xuất'),
+              content: const Text('Bạn có chắc chắn muốn đăng xuất?'),
+              actionsAlignment: MainAxisAlignment.spaceBetween,
+              actions: [
+              TextButton(
+              onPressed: () {
+        Navigator.of(context).pop();
+        setState(() => currentUser = null);
+        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+        },child: const Text('Có'),
+              ),
+                TextButton(onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Không'),
+                ),
+              ],
+          ),
         ),
     );
   }
@@ -159,230 +158,224 @@ class _AccountPageState extends State<AccountPage> {
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
-            child: Padding(
-            padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-          const Text(
-          'Tài khoản',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 12),
+                child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Tài khoản',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
 
-        // Form thông tin người dùng
-        Container(
-        padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(12),
-    boxShadow: const [
-    BoxShadow(
-    color: Colors.black12,
-    blurRadius: 6,
-    offset: Offset(0, 2),
-    ),
-    ],
-    ),
-    child: Column(
-    children: [
-      Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: nameController,
-              readOnly: !isEditingName,
-              decoration: const InputDecoration(
-                labelText: 'Họ và tên',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ),
-          IconButton(
-            icon: Icon(isEditingName ? Icons.check : Icons.edit),
-            onPressed: () {
-              setState(() {
-                isEditingName = !isEditingName;
-              });
-            },
-          ),
-        ],
-      ),
-      const SizedBox(height: 16),
-      Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: phoneController,
-              readOnly: !isEditingPhone,
-              decoration: const InputDecoration(
-                labelText: 'Số điện thoại',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ),
-        ],
-      ),
+                        // Form thông tin người dùng
+                        // Form thông tin người dùng
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              // Họ và tên
+                              TextField(
+                                controller: nameController,
+                                readOnly: !isEditingName,
+                                decoration: InputDecoration(
+                                  labelText: 'Họ và tên',
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(isEditingName ? Icons.check : Icons.edit),
+                                    onPressed: () {
+                                      setState(() {
+                                        isEditingName = !isEditingName;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
 
-      const SizedBox(height: 16),
-      Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: emailController,
-              readOnly: !isEditingEmail,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ),
-        ],
-      ),
+                              const SizedBox(height: 16),
 
-      const SizedBox(height: 16),
-      Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: addressController,
-              readOnly: !isEditingAddress,
-              minLines: 1,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Địa chỉ',
-                border: OutlineInputBorder(),
-              ),
-            ),
+                              // Số điện thoại
+                              TextField(
+                                controller: phoneController,
+                                readOnly: !isEditingPhone,
+                                decoration: InputDecoration(
+                                  labelText: 'Số điện thoại',
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(isEditingPhone ? Icons.check : Icons.edit),
+                                    onPressed: () {
+                                      setState(() {
+                                        isEditingPhone = !isEditingPhone;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
 
-          ),
-          IconButton(
-            icon: Icon(isEditingAddress ? Icons.check : Icons.edit),
-            onPressed: () {
-              setState(() {
-                isEditingAddress = !isEditingAddress;
-              });
-            },
-          ),
-        ],
-      ),
+                              const SizedBox(height: 16),
 
-      const SizedBox(height: 24),
-      Center(
-        child: ElevatedButton(
-          onPressed: _saveChanges,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
-          ),
-          child: const Text('Lưu thay đổi'),
-        ),
-      ),
-    ],
-    ),
-        ),
-        const SizedBox(height: 24),
+                              // Email
+                              TextField(
+                                controller: emailController,
+                                readOnly: true,
+                                decoration: const InputDecoration(
+                                  labelText: 'Email',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
 
-        const Text(
-          'Bảo mật',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 12),
 
-        // Các tùy chọn bảo mật
-        Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    decoration: BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(12),
-    boxShadow: const [
-    BoxShadow(
-    color: Colors.black12,
-    blurRadius: 4,
-    offset: Offset(0, 2),
-    ),
-    ],
-    ),
-    child: Column(
-    children: [
-    InkWell(
-    onTap: _changePassword,child: Container(
-    padding: const EdgeInsets.symmetric(vertical: 12),
-    decoration: const BoxDecoration(
-    border: Border(bottom: BorderSide(color: Colors.black12)),
-    ),
-    child: Row(
-    children: const [
-    Icon(Icons.lock_reset, size: 28),
-    SizedBox(width: 12),
-    Expanded(
-    child: Text(
-    'Đổi mật khẩu',
-    style: TextStyle(fontSize: 16),
-    ),
-    ),
-    Icon(Icons.chevron_right),
-    ],
-    ),
-    ),
-    ),
-    InkWell(
-    onTap: _lockAccount,
-    child: Container(
-    padding: const EdgeInsets.symmetric(vertical: 12),
-    decoration: const BoxDecoration(
-    border: Border(bottom: BorderSide(color: Colors.black12)),
-    ),
-    child: Row(
-    children: const [
-    Icon(Icons.lock_outline, size: 28),
-    SizedBox(width: 12),
-    Expanded(
-    child: Text(
-    'Khoá tài khoản',
-    style: TextStyle(fontSize: 16),
-    ),
-    ),
-    Text(
-    'Đang tắt',
-    style: TextStyle(color: Colors.grey),
-    ),
-    Icon(Icons.chevron_right),
-    ],
-    ),
-    ),
-    ),
-    InkWell(
-    onTap: _confirmLogout,
-    child: Container(
-    padding: const EdgeInsets.symmetric(vertical: 12),
-    child: Row(
-    children: const [
-    Icon(Icons.logout, size: 28, color: Colors.red),
-    SizedBox(width: 12),
-    Expanded(
-    child: Text(
-    'Đăng xuất',
-    style: TextStyle(fontSize: 16, color: Colors.red),),
-    ),
-      Icon(Icons.chevron_right, color: Colors.red),
-    ],
-    ),
-    ),
-    ),
-    ],
-    ),
-        ),
-          ],
-        ),
-            ),
+                              const SizedBox(height: 16),
+
+                              // Địa chỉ
+                              TextField(
+                                controller: addressController,
+                                readOnly: !isEditingAddress,
+                                minLines: 1,
+                                maxLines: 3,
+                                decoration: InputDecoration(
+                                  labelText: 'Địa chỉ',
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(isEditingAddress ? Icons.check : Icons.edit),
+                                    onPressed: () {
+                                      setState(() {
+                                        isEditingAddress = !isEditingAddress;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              Center(
+                                child: ElevatedButton(
+                                  onPressed: _saveChanges,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue,
+                                  ),
+                                  child: const Text('Lưu thay đổi'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                    const Text(
+                      'Bảo mật',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Các tùy chọn bảo mật
+                    Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 4,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                            children: [
+                            InkWell(
+                            onTap: _changePassword,child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: const BoxDecoration(
+                              border: Border(bottom: BorderSide(color: Colors.black12)),
+                            ),
+                            child: Row(
+                                children: const [
+                                Icon(Icons.lock_reset, size: 28),
+                                SizedBox(width: 12),
+                                Expanded(
+                                    child: Text(
+                                      'Đổi mật khẩu',style: TextStyle(fontSize: 16),
+                                    ),
+                                ),
+                                  Icon(Icons.chevron_right),
+                                ],
+                            ),
+                            ),
+                            ),
+                              InkWell(
+                                onTap: _lockAccount,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  decoration: const BoxDecoration(
+                                    border: Border(bottom: BorderSide(color: Colors.black12)),
+                                  ),
+                                  child: Row(
+                                    children: const [
+                                      Icon(Icons.lock_outline, size: 28),
+                                      SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          'Khoá tài khoản',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ),
+                                      Text(
+                                        'Đang tắt',
+                                        style: TextStyle(color: Colors.grey),
+                                      ),
+                                      Icon(Icons.chevron_right),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: _confirmLogout,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  child: Row(
+                                    children: const [
+                                      Icon(Icons.logout, size: 28, color: Colors.red),
+                                      SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          'Đăng xuất',
+                                          style: TextStyle(fontSize: 16, color: Colors.red),),
+                                      ),
+                                      Icon(Icons.chevron_right, color: Colors.red),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                        ),
+                    ),
+                      ],
+                    ),
+                ),
             ),
         ),
             ],
