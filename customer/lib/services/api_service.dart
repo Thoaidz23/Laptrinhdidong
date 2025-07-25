@@ -6,6 +6,7 @@ import '../model/order.dart';
 import '../model/user.dart';
 import '../model/cart_item.dart';
 import '../model/about.dart';
+import '../model/banner.dart';
 
 class ApiService {
   static String baseUrl = "http://10.0.2.2/ttsfood/api"; // localhost for Android emulator
@@ -374,6 +375,18 @@ class ApiService {
       print("❌ Lỗi tạo payment: ${data['error']}");
     }
   }
+
+  static Future<List<BannerModel>> fetchBanners() async {
+    final response = await http.get(Uri.parse('$baseUrl/get_banners.php'));
+
+    if (response.statusCode == 200) {
+      final List jsonData = json.decode(response.body);
+      return jsonData.map((item) => BannerModel.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load banners');
+    }
+  }
+
 
 
 
