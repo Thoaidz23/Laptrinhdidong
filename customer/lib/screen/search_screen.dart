@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../widget/ProductGrid.dart';
 import '../services/api_service.dart';
 import '../model/product.dart';
-
+import 'product_detail_screen.dart';
 class SearchScreen extends StatefulWidget {
   final String keyword;
   const SearchScreen({super.key, required this.keyword});
@@ -60,10 +60,16 @@ class _SearchScreenState extends State<SearchScreen> {
     itemBuilder: (context, index) {
     final product = results[index];
     return GestureDetector(
-    onTap: () {
-    // Chuyển đến trang chi tiết nếu có
-    },
-    child: Card(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ProductDetailScreen(product: product),
+          ),
+        );
+      },
+
+      child: Card(
     elevation: 4,
     shape: RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(10),

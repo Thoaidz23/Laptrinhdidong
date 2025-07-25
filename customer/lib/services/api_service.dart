@@ -102,6 +102,33 @@ class ApiService {
     }
   }
 
+  static Future<Map<String, dynamic>> changePassword({
+    required int userId,
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final url = Uri.parse('$baseUrl/change_password.php');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'id_user': userId,
+        'current_password': currentPassword,
+        'new_password': newPassword,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return {
+        'status': false,
+        'message': 'Lỗi máy chủ. Vui lòng thử lại.',
+      };
+    }
+  }
+
+
 
   static Future<List<Order>> fetchOrders(int userId) async {
     final response = await http.get(Uri.parse("$baseUrl/get_user_orders.php?user_id=$userId"));
@@ -142,7 +169,12 @@ class ApiService {
   }
 
 
-  static Future<bool> placeOrder(int userId, List<Map<String, dynamic>> items, double total) async {
+  static Future<bool> placeOrder(
+      int userId,
+      List<Map<String, dynamic>> items,
+      double total, {
+        bool isBuyNow = false,
+      }) async {
     final response = await http.post(
       Uri.parse("$baseUrl/create_order.php"),
       headers: {"Content-Type": "application/json"},
@@ -150,11 +182,13 @@ class ApiService {
         "user_id": userId,
         "items": items,
         "total_price": total,
+        "isBuyNow": isBuyNow, // Gửi cờ "mua ngay"
       }),
     );
     final data = json.decode(response.body);
     return data['status'] == 'success';
   }
+
 
   static Future<List<CartItem>> getCart(int userId) async {
     final response = await http.get(Uri.parse('$baseUrl/get_cart.php?id_user=$userId'));
