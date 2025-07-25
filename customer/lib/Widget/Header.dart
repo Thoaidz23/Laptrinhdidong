@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
-import '../screen/account_screen.dart'; // Import đúng đường dẫn đến file AccountPage
-import '../Widget/Header.dart';
+import '../screen/account_screen.dart';
+import '../model/user.dart';
+
 class Header extends StatelessWidget {
   const Header({super.key});
 
+  String getFirstName(String fullName) {
+    return fullName.trim().split(' ').last;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final name = currentUser != null ? getFirstName(currentUser!.name) : '';
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 14),
+      padding: const EdgeInsets.fromLTRB(16, 40, 16, 14),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(color: Colors.grey.shade300),
@@ -26,7 +33,17 @@ class Header extends StatelessWidget {
           ),
           Row(
             children: [
-              const SizedBox(width: 30),
+              if (name.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -37,7 +54,7 @@ class Header extends StatelessWidget {
                 child: const Icon(Icons.account_circle, size: 38),
               ),
             ],
-          )
+          ),
         ],
       ),
     );
