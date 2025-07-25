@@ -83,93 +83,91 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      body: Column(
-        children: [
-          const Header(),
+        backgroundColor: const Color(0xFFF5F5F5),
+        body: Column(
+            children: [
+            const Header(),
 
-          // Thanh tiêu đề
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: const BoxDecoration(
+        // Thanh tiêu đề
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: const BoxDecoration(
               color: Colors.white,
               boxShadow: [
-                BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
-              ],
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                const Expanded(
-                  child: Center(
-                    child: Text(
-                      'Đổi mật khẩu',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
+              BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),],
+          ),
+          child: Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.pop(context),
+              ),
+              const Expanded(
+                child: Center(
+                  child: Text(
+                    'Đổi mật khẩu',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
-                const SizedBox(width: 48),
-              ],
-            ),
+              ),
+              const SizedBox(width: 48),
+            ],
           ),
+        ),
 
-          // Nội dung form
-          Expanded(
+        // Nội dung form
+        Expanded(
             child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Thông tin bảo mật',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 6,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
+                child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Form(
+                        key: _formKey,
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Mật khẩu hiện tại
-                            TextFormField(
-                              controller: currentPasswordController,
-                              obscureText: _obscureCurrent,
-                              validator: _validatePassword,
-                              decoration: InputDecoration(
-                                labelText: 'Mật khẩu hiện tại',
-                                border: const OutlineInputBorder(),
-                                suffixIcon: IconButton(
-                                  icon: Icon(_obscureCurrent
-                                      ? Icons.visibility_off
-                                      : Icons.visibility),
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscureCurrent = !_obscureCurrent;
-                                    });
-                                  },
+                          const Text(
+                          'Thông tin bảo mật',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 6,
+                                  offset: Offset(0, 2),
                                 ),
-                              ),
+                              ],
+                            ),
+                            child: Column(
+                                children: [
+                                // Mật khẩu hiện tại
+                                TextFormField(
+                                controller: currentPasswordController,
+                                obscureText: _obscureCurrent,
+                                validator: _validatePassword,
+                                decoration: InputDecoration(
+                                    labelText: 'Mật khẩu hiện tại',
+                                    border: const OutlineInputBorder(),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(_obscureCurrent
+                                          ? Icons.visibility_off
+                                          : Icons.visibility),
+                                      onPressed: () {
+                                        setState(() {
+                                          _obscureCurrent = !_obscureCurrent;
+                                        });
+                                      },),
+                                ),
                             ),
                             const SizedBox(height: 16),
 
@@ -225,25 +223,24 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                             ),
                             const SizedBox(height: 24),
                             Center(
-                              child: ElevatedButton(
-                                onPressed: _handleChangePassword,
-                                style: ElevatedButton.styleFrom(
+                                child: ElevatedButton(
+                                  onPressed: _handleChangePassword,style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.blue,
                                 ),
-                                child: const Text('Xác nhận'),
-                              ),
+                                  child: const Text('Xác nhận'),
+                                ),
                             ),
+                                ],
+                            ),
+                        ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
+                    ),
                 ),
-              ),
             ),
-          ),
-        ],
-      ),
+        ),
+            ],
+        ),
     );
   }
 }
