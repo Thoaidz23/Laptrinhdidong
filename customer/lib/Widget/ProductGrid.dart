@@ -3,6 +3,9 @@ import '../model/product.dart';
 import '../services/api_service.dart';
 import '../screen/product_detail_screen.dart';
 
+import 'package:intl/intl.dart';
+final currencyFormatter = NumberFormat("#,###", "vi_VN");
+
 class ProductGrid extends StatefulWidget {
   final int? idCategoryProduct; // Cho phép null
 
@@ -96,7 +99,7 @@ class _ProductGridState extends State<ProductGrid> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${product.price.toStringAsFixed(0)} đ',
+                            '${currencyFormatter.format(product.price)} đ',
                             style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                           ),
                         ],
