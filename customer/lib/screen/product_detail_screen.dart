@@ -88,6 +88,7 @@
           children: [
             const Header(),
             const SizedBox(height: 10),
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0),
               child: Row(
@@ -189,7 +190,7 @@
                         Text(
                           '${product.price.toStringAsFixed(0)}đ',
                           style:
-                          const TextStyle(fontSize: 25, color: Colors.green),
+                          const TextStyle(fontSize: 25, color: Colors.red, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -352,7 +353,7 @@
                   label: const Text('Mua ngay',
                       style: TextStyle(fontSize: 18, color: Colors.white)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
+                    backgroundColor: Colors.red,
                     padding: const EdgeInsets.symmetric(vertical: 18), // 👈 to hơn
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
