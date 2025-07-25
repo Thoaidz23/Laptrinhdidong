@@ -225,6 +225,14 @@ class _AccountPageState extends State<AccountPage> {
               ),
             ),
           ),
+          IconButton(
+            icon: Icon(isEditingPhone ? Icons.check : Icons.edit),
+            onPressed: () {
+              setState(() {
+                isEditingPhone = !isEditingPhone;
+              });
+            },
+          ),
         ],
       ),
 
