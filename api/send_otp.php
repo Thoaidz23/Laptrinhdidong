@@ -1,5 +1,7 @@
 <?php
 
+$mail->CharSet = 'UTF-8'; 
+
 require 'PHPMailer/PHPMailer-master/src/PHPMailer.php';
 require 'PHPMailer/PHPMailer-master/src/SMTP.php';
 require 'PHPMailer/PHPMailer-master/src/Exception.php';
