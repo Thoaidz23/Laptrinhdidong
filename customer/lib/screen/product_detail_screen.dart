@@ -7,8 +7,9 @@
   import '../model/user.dart';
   import '../model/cart_item.dart';
   import 'payment_screen.dart';
-
   import 'package:intl/intl.dart';
+  import 'main_screen.dart';
+
   final currencyFormatter = NumberFormat("#,###", "vi_VN");
 
   class ProductDetailScreen extends StatefulWidget {
@@ -121,8 +122,20 @@
                   IconButton(
                     icon: const Icon(Icons.shopping_cart, color: Colors.white),
                     onPressed: () {
-                      // 👉 Nếu muốn chuyển đến trang giỏ hàng, thêm lệnh điều hướng ở đây
-                      // Navigator.push(context, MaterialPageRoute(builder: (_) => CartScreen()));
+                      if (currentUser == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Vui lòng đăng nhập để xem giỏ hàng')),
+                        );
+                        return;
+                      }
+
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const MainScreen(initialIndex: 2),
+                        ),
+                            (route) => false,
+                      );
                     },
                   ),
                 ],
