@@ -27,6 +27,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
 
+  final FocusNode _nameFocusNode = FocusNode();
+  final FocusNode _phoneFocusNode = FocusNode();
+  final FocusNode _addressFocusNode = FocusNode();
+
+  bool isEditingName = false;
+  bool isEditingPhone = false;
+  bool isEditingAddress = false;
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +49,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
     _nameController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
+    _nameFocusNode.dispose();
+    _phoneFocusNode.dispose();
+    _addressFocusNode.dispose();
     super.dispose();
   }
 
@@ -193,8 +204,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
         children: [
           const Header(),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            color: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            color: Colors.orange,
             child: Row(
               children: [
                 IconButton(
@@ -205,7 +216,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   child: Center(
                     child: Text(
                       'Thanh toán',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -263,18 +274,94 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Họ tên
                         TextField(
                           controller: _nameController,
-                          decoration: const InputDecoration(labelText: 'Họ tên'),
+                          focusNode: _nameFocusNode,
+                          enabled: isEditingName,
+                          decoration: InputDecoration(
+                            labelText: 'Họ tên',
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                isEditingName ? Icons.check : Icons.edit,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() => isEditingName = !isEditingName);
+                                if (isEditingName) {
+                                  Future.delayed(const Duration(milliseconds: 100), () {
+                                    FocusScope.of(context).requestFocus(_nameFocusNode);
+                                  });
+                                }
+                              },
+                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(color: Colors.orange, width: 2),
+                            ),
+                          ),
                         ),
+                        const SizedBox(height: 12),
+
+                        // SĐT
                         TextField(
                           controller: _phoneController,
+                          focusNode: _phoneFocusNode,
                           keyboardType: TextInputType.phone,
-                          decoration: const InputDecoration(labelText: 'SĐT'),
+                          enabled: isEditingPhone,
+                          decoration: InputDecoration(
+                            labelText: 'SĐT',
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                isEditingPhone ? Icons.check : Icons.edit,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() => isEditingPhone = !isEditingPhone);
+                                if (isEditingPhone) {
+                                  Future.delayed(const Duration(milliseconds: 100), () {
+                                    FocusScope.of(context).requestFocus(_phoneFocusNode);
+                                  });
+                                }
+                              },
+                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(color: Colors.orange, width: 2),
+                            ),
+                          ),
                         ),
+                        const SizedBox(height: 12),
+
+                        // Địa chỉ
                         TextField(
                           controller: _addressController,
-                          decoration: const InputDecoration(labelText: 'Địa chỉ'),
+                          focusNode: _addressFocusNode,
+                          enabled: isEditingAddress,
+                          decoration: InputDecoration(
+                            labelText: 'Địa chỉ',
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                isEditingAddress ? Icons.check : Icons.edit,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() => isEditingAddress = !isEditingAddress);
+                                if (isEditingAddress) {
+                                  Future.delayed(const Duration(milliseconds: 100), () {
+                                    FocusScope.of(context).requestFocus(_addressFocusNode);
+                                  });
+                                }
+                              },
+                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(color: Colors.orange, width: 2),
+                            ),
+                          ),
                         ),
                       ],
                     ),
