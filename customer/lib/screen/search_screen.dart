@@ -3,6 +3,10 @@ import '../widget/ProductGrid.dart';
 import '../services/api_service.dart';
 import '../model/product.dart';
 import 'product_detail_screen.dart';
+
+import 'package:intl/intl.dart';
+final currencyFormatter = NumberFormat("#,###", "vi_VN");
+
 class SearchScreen extends StatefulWidget {
   final String keyword;
   const SearchScreen({super.key, required this.keyword});
@@ -98,9 +102,10 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             const SizedBox(height: 4),
             Text(
-              '${product.price.toStringAsFixed(0)} đ',
+              '${NumberFormat('#,###', 'vi_VN').format(product.price)} đ',
               style: const TextStyle(color: Colors.orange),
             ),
+
           ],
         ),
       ),

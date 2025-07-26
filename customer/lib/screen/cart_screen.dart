@@ -5,6 +5,9 @@ import '../model/cart_item.dart';
 import '../model/user.dart';
 import '../services/api_service.dart';
 
+import 'package:intl/intl.dart';
+final currencyFormatter = NumberFormat("#,###", "vi_VN");
+
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
 
@@ -140,7 +143,9 @@ class _CartScreenState extends State<CartScreen> {
                                   ],
                                 ),
 
-                                Text("Giá: ${item.price}đ"),
+                                Text(
+                                  "Giá: ${NumberFormat('#,###', 'vi_VN').format(item.price)} đ",
+                                ),
                               ],
                             ),
                           ),
@@ -159,12 +164,14 @@ class _CartScreenState extends State<CartScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Tổng cộng:",
-                            style:
-                            TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        Text("${total.toStringAsFixed(0)}đ",
-                            style: const TextStyle(
-                                fontSize: 16, color: Colors.green)),
+                        const Text(
+                          "Tổng cộng:",
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          "${NumberFormat('#,###', 'vi_VN').format(total)} đ",
+                          style: const TextStyle(fontSize: 16, color: Colors.green),
+                        ),
                       ],
                     ),
                   ],

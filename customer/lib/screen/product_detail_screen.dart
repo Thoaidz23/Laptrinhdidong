@@ -8,6 +8,9 @@
   import '../model/cart_item.dart';
   import 'payment_screen.dart';
 
+  import 'package:intl/intl.dart';
+  final currencyFormatter = NumberFormat("#,###", "vi_VN");
+
   class ProductDetailScreen extends StatefulWidget {
     final Product product;
     const ProductDetailScreen({super.key, required this.product});
@@ -207,9 +210,12 @@
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${product.price.toStringAsFixed(0)}đ',
-                          style:
-                          const TextStyle(fontSize: 25, color: Colors.red, fontWeight: FontWeight.bold),
+                          '${NumberFormat('#,###', 'vi_VN').format(product.price)} đ',
+                          style: const TextStyle(
+                            fontSize: 25,
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),

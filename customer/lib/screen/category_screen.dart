@@ -6,6 +6,9 @@ import '../services/api_service.dart';
 import 'package:html/parser.dart' as html_parser;
 import '../Widget/MenuBar.dart';
 
+import 'package:intl/intl.dart';
+final currencyFormatter = NumberFormat("#,###", "vi_VN");
+
 class CategoryScreen extends StatefulWidget {
   final String? selectedCategoryName;
   const CategoryScreen({super.key, this.selectedCategoryName});
@@ -211,7 +214,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                 style: const TextStyle(fontSize: 13),
                               ),
                               const SizedBox(height: 4),
-                              Text("Giá: ${p.price.toInt()}đ", style: const TextStyle(color: Colors.green)),
+                              Text(
+                                'Giá: ${NumberFormat('#,###', 'vi_VN').format(p.price)} đ',
+                                style: const TextStyle(color: Colors.green),
+                              ),
                             ],
                           ),
                         ),
