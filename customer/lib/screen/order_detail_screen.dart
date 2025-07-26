@@ -4,6 +4,9 @@ import '../widget/header.dart';
 import '../services/api_service.dart';
 import '../model/order_item.dart';
 
+import 'package:intl/intl.dart';
+final currencyFormatter = NumberFormat("#,###", "vi_VN");
+
 class OrderDetailScreen extends StatefulWidget {
   final Order order;
 
@@ -132,9 +135,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           Align(
             alignment: Alignment.centerRight,
             child: Text(
-              "Tổng tiền: ${order.total}đ",
+              "Tổng tiền: ${NumberFormat('#,###', 'vi_VN').format(order.total)} đ",
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
             ),
+
           ),
         ],
       ),
@@ -196,7 +200,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 Text(name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 4),
                 Text("Số lượng: $quantity", style: const TextStyle(color: Colors.black54)),
-                Text("Giá: ${price}đ", style: const TextStyle(color: Colors.black54)),
+                Text(
+                  "Giá: ${NumberFormat('#,###', 'vi_VN').format(price)} đ",
+                  style: const TextStyle(color: Colors.black54),
+                ),
               ],
             ),
           ),

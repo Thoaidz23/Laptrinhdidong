@@ -8,6 +8,9 @@ import '../services/api_service.dart';
 import 'paypal_payment_screen.dart';
 import 'main_screen.dart';
 
+import 'package:intl/intl.dart';
+final currencyFormatter = NumberFormat("#,###", "vi_VN");
+
 class PaymentScreen extends StatefulWidget {
   final List<CartItem> cartItems;
 
@@ -243,7 +246,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   children: [
                                     Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                                     Text("SL: ${item.quantity}"),
-                                    Text("Giá: ${item.price}đ"),
+                                    Text("Giá: ${NumberFormat('#,###', 'vi_VN').format(item.price)} đ"),
                                   ],
                                 ),
                               ),
