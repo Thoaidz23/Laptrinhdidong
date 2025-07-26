@@ -5,6 +5,9 @@ import '../Widget/Header.dart';
 import '../model/user.dart';
 import 'order_detail_screen.dart';
 
+import 'package:intl/intl.dart';
+final currencyFormatter = NumberFormat("#,###", "vi_VN");
+
 class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen({super.key});
 
@@ -191,9 +194,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                               const SizedBox(height: 4),
                               Text(
                                   "Ngày mua: ${order.date} lúc ${order.time}"),
-                              Text("Tổng tiền: ${order.total}đ",
-                                  style: const TextStyle(
-                                      color: Colors.green)),
+                              Text(
+                                "Tổng tiền: ${NumberFormat('#,###', 'vi_VN').format(order.total)} đ",
+                                style: const TextStyle(color: Colors.green),
+                              ),
+
                               Text(
                                   "Thanh toán: ${order.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}",
                                   style: TextStyle(
