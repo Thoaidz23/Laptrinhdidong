@@ -127,9 +127,9 @@ class _AccountPageState extends State<AccountPage> {
         // Tiêu đề
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: Colors.orange,
             boxShadow: [
               BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
             ],
@@ -144,7 +144,7 @@ class _AccountPageState extends State<AccountPage> {
                 child: Center(
                   child: Text(
                     'Thông tin tài khoản',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,color: Colors.white),
                   ),
                 ),
               ),
@@ -269,9 +269,14 @@ class _AccountPageState extends State<AccountPage> {
                                 child: ElevatedButton(
                                   onPressed: _saveChanges,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue,
+                                    backgroundColor: Colors.blueAccent,
                                   ),
-                                  child: const Text('Lưu thay đổi'),
+                                  child: const Text('Lưu thay đổi',
+                                    style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  )),
+
                                 ),
                               ),
                             ],

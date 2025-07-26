@@ -91,9 +91,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         // Thanh tiêu đề
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           decoration: const BoxDecoration(
-              color: Colors.white,
+              color: Colors.orange,
               boxShadow: [
               BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),],
           ),
@@ -107,7 +107,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 child: Center(
                   child: Text(
                     'Đổi mật khẩu',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20,color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -227,7 +227,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                                   onPressed: _handleChangePassword,style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.blue,
                                 ),
-                                  child: const Text('Xác nhận'),
+                                  child: const Text('Xác nhận',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color:Colors.white
+                                  ),),
                                 ),
                             ),
                                 ],
