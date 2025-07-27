@@ -6,6 +6,9 @@ import '../screen/main_screen.dart';
 import '../Widget/Header.dart';
 import '../Widget/MenuBar.dart';
 import 'main_screen.dart';
+import 'forgot_password_screen.dart'; // ✅ nếu cùng thư mục
+
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -84,12 +87,28 @@ class _LoginScreenState extends State<LoginScreen> {
       final body = utf8.decode(response.bodyBytes);
       if (response.statusCode == 200 && body.startsWith('{')) {
         final data = jsonDecode(body);
-        if (data['status'] == true) {
-          currentUser = User.fromJson(data['user']);
-          Navigator.pop(context); // thành công → trở về
-        } else {
-          setState(() => _loginError = data['message'] ?? 'Sai thông tin đăng nhập');
+
+        if (data['status'] == false) {
+          _showMessage(data['message']);
+          return;
         }
+
+        final user = User.fromJson(data['user']);
+
+        // Kiểm tra tài khoản bị khóa từ phía Flutter
+        if (user.lock_account == 1) {
+          _showMessage("Tài khoản của bạn đã bị khóa. Vui lòng sử dụng chức năng Quên mật khẩu để mở lại.");
+          return;
+        }
+
+// ✅ Lưu người dùng hiện tại
+        currentUser = user;
+
+// ✅ Đăng nhập thành công → điều hướng
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => MainScreen(initialIndex: 0)),
+        );
       } else {
         setState(() => _loginError = 'Lỗi phản hồi từ máy chủ');
       }
@@ -97,6 +116,8 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _loginError = 'Không thể kết nối tới server');
     }
   }
+
+
 
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
@@ -168,7 +189,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {},
-                        child: const Text('Bạn quên mật khẩu?'),
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+                            );
+                          },
+                          child: const Text('Bạn quên mật khẩu?'),
+                        ),
+
                       ),
                     ),
 
@@ -242,4 +272,10 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
 }

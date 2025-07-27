@@ -3,6 +3,8 @@ import '../Widget/Header.dart';
 import '../model/user.dart';
 import '../screen/changePassword.dart';
 import '../services/api_service.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -66,6 +68,7 @@ class _AccountPageState extends State<AccountPage> {
       phone: phoneController.text,
       email: emailController.text,
       address: addressController.text,
+      lock_account: currentUser!.lock_account,
     );
 
     final success = await ApiService.updateUser(updatedUser);
@@ -86,10 +89,48 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   void _lockAccount() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Tính năng đang phát triển")),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Xác nhận khóa tài khoản'),
+        content: const Text('Bạn có chắc chắn muốn khóa tài khoản? Bạn sẽ không thể đăng nhập nếu không đặt lại mật khẩu.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Không'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context); // Đóng dialog
+              final response = await http.post(
+                Uri.parse("${ApiService.baseUrl}/lock_account.php"),
+                headers: {"Content-Type": "application/json"},
+                body: jsonEncode({"id_user": currentUser!.id}),
+
+              );
+              final data = jsonDecode(response.body);
+
+              if (data['status'] == true) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Tài khoản đã bị khóa. Vui lòng đăng nhập lại để kiểm tra.")),
+                );
+                setState(() => currentUser = null);
+                Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(data['message'] ?? "Lỗi khi khóa tài khoản")),
+                );
+              }
+            },
+            child: const Text('Đồng ý'),
+          ),
+        ],
+      ),
     );
+    print("🔒 Gửi yêu cầu khóa tài khoản với ID: ${currentUser!.id}");
   }
+
+
 
   void _confirmLogout() {
     showDialog(
@@ -127,9 +168,9 @@ class _AccountPageState extends State<AccountPage> {
         // Tiêu đề
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: Colors.orange,
             boxShadow: [
               BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
             ],
@@ -144,7 +185,7 @@ class _AccountPageState extends State<AccountPage> {
                 child: Center(
                   child: Text(
                     'Thông tin tài khoản',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,color: Colors.white),
                   ),
                 ),
               ),
@@ -269,9 +310,14 @@ class _AccountPageState extends State<AccountPage> {
                                 child: ElevatedButton(
                                   onPressed: _saveChanges,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue,
+                                    backgroundColor: Colors.blueAccent,
                                   ),
-                                  child: const Text('Lưu thay đổi'),
+                                  child: const Text('Lưu thay đổi',
+                                    style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  )),
+
                                 ),
                               ),
                             ],
@@ -343,10 +389,7 @@ class _AccountPageState extends State<AccountPage> {
                                           style: TextStyle(fontSize: 16),
                                         ),
                                       ),
-                                      Text(
-                                        'Đang tắt',
-                                        style: TextStyle(color: Colors.grey),
-                                      ),
+
                                       Icon(Icons.chevron_right),
                                     ],
                                   ),

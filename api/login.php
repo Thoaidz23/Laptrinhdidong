@@ -30,7 +30,16 @@ $result = $stmt->get_result();
 if ($result->num_rows > 0) {
     $user = $result->fetch_assoc();
 
-    // So sánh password với password đã hash trong database
+    // ✅ Kiểm tra nếu tài khoản bị khóa
+    if ((int)$user['lock_account'] === 1) {
+        echo json_encode([
+            'status' => false,
+            'message' => 'Tài khoản của bạn đã bị khóa. Vui lòng sử dụng chức năng Quên mật khẩu để mở lại.',
+        ]);
+        exit;
+    }
+
+    // ✅ Kiểm tra mật khẩu
     if (password_verify($password, $user['password'])) {
         echo json_encode([
             'status' => true,
@@ -41,6 +50,7 @@ if ($result->num_rows > 0) {
                 'email' => $user['email'],
                 'phone' => $user['phone'],
                 'address' => $user['address'],
+                'lock_account' => (int)$user['lock_account'], // <-- Truyền về luôn cho Flutter dùng
             ]
         ]);
     } else {
@@ -55,5 +65,4 @@ if ($result->num_rows > 0) {
         'message' => 'Email hoặc mật khẩu không đúng'
     ]);
 }
-
 ?>

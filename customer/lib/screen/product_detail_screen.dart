@@ -7,8 +7,9 @@
   import '../model/user.dart';
   import '../model/cart_item.dart';
   import 'payment_screen.dart';
-
   import 'package:intl/intl.dart';
+  import 'main_screen.dart';
+
   final currencyFormatter = NumberFormat("#,###", "vi_VN");
 
   class ProductDetailScreen extends StatefulWidget {
@@ -122,8 +123,20 @@
                   IconButton(
                     icon: const Icon(Icons.shopping_cart, color: Colors.white),
                     onPressed: () {
-                      // 👉 Nếu muốn chuyển đến trang giỏ hàng, thêm lệnh điều hướng ở đây
-                      // Navigator.push(context, MaterialPageRoute(builder: (_) => CartScreen()));
+                      if (currentUser == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Vui lòng đăng nhập để xem giỏ hàng')),
+                        );
+                        return;
+                      }
+
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const MainScreen(initialIndex: 2),
+                        ),
+                            (route) => false,
+                      );
                     },
                   ),
                 ],
@@ -303,33 +316,62 @@
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () async {
-                        final userId = currentUser?.id; // ⚠️ Lấy từ user đã đăng nhập (tạm hardcoded)
+                        final userId = currentUser?.id;
 
                         if (userId == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Bạn cần đăng nhập để thêm vào giỏ hàng')),
+                            const SnackBar(
+                              content: Text('Bạn cần đăng nhập để thêm vào giỏ hàng'),
+                              backgroundColor: Colors.red,
+                              behavior: SnackBarBehavior.floating,
+                              margin: EdgeInsets.only(top: 16, left: 16, right: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(8)),
+                              ),
+                              duration: Duration(seconds: 2),
+                            ),
                           );
                           return;
                         }
+
                         final product = widget.product;
 
                         final success = await ApiService.addToCart(
                           userId,
                           product.id,
-                          _quantity,     // từ số lượng đã chọn
+                          _quantity,
                           product.price,
                         );
 
                         if (success) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Đã thêm vào giỏ hàng')),
+                            const SnackBar(
+                              content: Text('Thêm sản phẩm vào giỏ hàng'),
+                              backgroundColor: Colors.green,
+                              behavior: SnackBarBehavior.floating,
+                              margin: EdgeInsets.only(top: 16, left: 16, right: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(8)),
+                              ),
+                              duration: Duration(seconds: 2),
+                            ),
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Lỗi khi thêm vào giỏ hàng')),
+                            const SnackBar(
+                              content: Text('❌ Lỗi khi thêm vào giỏ hàng'),
+                              backgroundColor: Colors.red,
+                              behavior: SnackBarBehavior.floating,
+                              margin: EdgeInsets.only(top: 16, left: 16, right: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(8)),
+                              ),
+                              duration: Duration(seconds: 2),
+                            ),
                           );
                         }
                       },
+
 
                       icon: const Icon(Icons.add_shopping_cart),
                       label: const Text('Thêm vào giỏ',
