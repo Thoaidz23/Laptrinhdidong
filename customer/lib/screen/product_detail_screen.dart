@@ -18,6 +18,7 @@
     @override
     State<ProductDetailScreen> createState() => _ProductDetailScreenState();
   }
+
   final Map<int, String> categoryNames = {
     1: 'Snack',
     2: 'Bánh',
@@ -284,10 +285,14 @@
                           icon: const Icon(Icons.add),
                           onPressed: () {
                             setState(() {
-                              _quantity++;
+                              // Giới hạn không vượt quá 50 và product.quantity
+                              if (_quantity < 50 && _quantity < product.quantity) {
+                                _quantity++;
+                              }
                             });
                           },
                         ),
+
                       ],
                     ),
                   ),
@@ -365,6 +370,7 @@
                       price: widget.product.price,
                       name: widget.product.name,
                       image: widget.product.image, // hoặc widget.product.imageUrl gốc nếu khác
+                        availableQuantity: widget.product.quantity,
                     );
 
                     Navigator.push(

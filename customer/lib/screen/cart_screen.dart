@@ -4,7 +4,6 @@ import 'payment_screen.dart';
 import '../model/cart_item.dart';
 import '../model/user.dart';
 import '../services/api_service.dart';
-
 import 'package:intl/intl.dart';
 final currencyFormatter = NumberFormat("#,###", "vi_VN");
 
@@ -18,6 +17,7 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   List<CartItem> _cartItems = [];
   bool _isLoading = true;
+  // Giới hạn tối đa mỗi sản phẩm
 
   @override
   void initState() {
@@ -122,14 +122,21 @@ class _CartScreenState extends State<CartScreen> {
                                   children: [
                                     const Text("Số lượng: "),
                                     IconButton(
-                                      icon: const Icon(Icons.remove),
-                                      onPressed: item.quantity > 1
+                                      icon: const Icon(Icons.add),
+                                      onPressed: item.quantity < item.availableQuantity && item.quantity < 50
                                           ? () async {
                                         await ApiService.updateCart(
-                                            currentUser!.id, item.idProduct, item.quantity - 1);
+                                          currentUser!.id,
+                                          item.idProduct,
+                                          item.quantity + 1,
+                                        );
                                         await _loadCart();
                                       }
-                                          : null,
+                                          : () {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Chỉ có thể mua tối đa ${item.availableQuantity > 50 ? 50 : item.availableQuantity} sản phẩm.')),
+                                        );
+                                      },
                                     ),
                                     Text('${item.quantity}', style: const TextStyle(fontSize: 16)),
                                     IconButton(

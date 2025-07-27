@@ -105,7 +105,6 @@ class _SearchScreenState extends State<SearchScreen> {
               '${NumberFormat('#,###', 'vi_VN').format(product.price)} đ',
               style: const TextStyle(color: Colors.orange),
             ),
-
           ],
         ),
       ),

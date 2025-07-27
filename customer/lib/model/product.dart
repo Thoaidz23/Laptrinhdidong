@@ -2,6 +2,7 @@ import '../services/api_service.dart';
 
 class Product {
   final int id;
+  final int quantity;
   final String name;
   final String content;
   final String image; // ảnh đại diện
@@ -17,6 +18,7 @@ class Product {
     required this.price,
     required this.id_category_product,
     required this.images,
+    required this.quantity
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -34,6 +36,7 @@ class Product {
       price: double.parse(json['price'].toString()),
       id_category_product: int.parse(json['id_category_product'].toString()),
       images: images,
+        quantity:  int.parse(json['quantity'].toString()),
     );
   }
 
