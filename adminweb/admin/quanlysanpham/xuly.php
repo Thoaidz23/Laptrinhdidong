@@ -58,7 +58,7 @@
             $sql = "SELECT * FROM tbl_product WHERE id_product = '$_GET[id_sanpham]'";
             $query = mysqli_query($mysqli, $sql);
             while($row = mysqli_fetch_array($query)) {
-                unlink("uploads/".$row["hinhanh"]);
+                unlink("uploads/".$row["image"]);
             }
     
             move_uploaded_file($hinhanh_tmp, "uploads/".$hinhanh);
@@ -124,7 +124,7 @@
         $sql_unlink = "SELECT * FROM tbl_product WHERE id_product = $id";
         $query_unlink = mysqli_query($mysqli, $sql_unlink);
         while($row = mysqli_fetch_array($query_unlink)) {
-            unlink("uploads/".$row['hinhanh']);
+            unlink("uploads/".$row['image']);
         };
 
         $sql_unlink_chitiet = "SELECT * FROM tbl_product_images WHERE id_product = $id";
