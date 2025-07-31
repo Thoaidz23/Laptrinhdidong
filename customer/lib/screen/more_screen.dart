@@ -3,6 +3,8 @@ import '../services/api_service.dart';
 import '../model/about.dart';
 import '../Widget/Header.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:html/dom.dart' as dom;
+import 'package:url_launcher/url_launcher.dart';
 
 class MoreScreen extends StatefulWidget {
   const MoreScreen({super.key});
@@ -18,6 +20,14 @@ class _MoreScreenState extends State<MoreScreen> {
   void initState() {
     super.initState();
     futureFooter = ApiService.fetchFooterItems();
+  }
+
+  void _launchUrl(Uri uri) async {
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      debugPrint("Không thể mở đường dẫn: $uri");
+    }
   }
 
   Widget buildInfoBox(FooterItem item) {
@@ -46,23 +56,22 @@ class _MoreScreenState extends State<MoreScreen> {
           const SizedBox(height: 8),
           Html(
             data: item.content,
+            onLinkTap: (String? url, Map<String, String> attributes, dom.Element? element) {
+              if (url != null) {
+                _launchUrl(Uri.parse(url));
+              }
+            },
             style: {
               "body": Style(
-                padding: HtmlPaddings.zero,
                 margin: Margins.zero,
+                padding: HtmlPaddings.zero,
                 fontSize: FontSize(14),
                 color: Colors.black,
               ),
-              "p": Style(
-                margin: Margins.only(bottom: 8),
-              ),
-              "a": Style(
-                color: Colors.blue,
-                textDecoration: TextDecoration.none,
-              ),
+              "p": Style(margin: Margins.only(bottom: 8)),
+              "a": Style(color: Colors.blue, textDecoration: TextDecoration.none),
             },
-          )
-          
+          ),
         ],
       ),
     );
