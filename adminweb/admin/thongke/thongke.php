@@ -73,7 +73,7 @@
 
 
 
-    <div class="col-lg-3 col-6">
+    <!-- <div class="col-lg-3 col-6">
     <div class="small-box bg-danger">
         <div class="inner">
             <h3>
@@ -93,7 +93,7 @@
             Xem thêm <i class="fas fa-arrow-circle-right"></i>
         </a>
     </div>
-</div>
+</div> -->
 
 
 <div class="col-lg-3 col-6">

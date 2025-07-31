@@ -77,18 +77,18 @@
 
                 if ($row_code = mysqli_fetch_array($result_get_code)) {
                     $code_order = $row_code['code_order'];
-                    $sql = "SELECT * FROM tbl_order_detail, tbl_sanpham WHERE tbl_order_detail.id_sanpham = tbl_sanpham.id_sanpham AND tbl_order_detail.code_order = '$code_order' ORDER BY tbl_sanpham.giasp DESC";
+                    $sql = "SELECT * FROM tbl_order_detail, tbl_product WHERE tbl_order_detail.id_product = tbl_product.id_product AND tbl_order_detail.code_order = '$code_order' ORDER BY tbl_product.price DESC";
                     $query = mysqli_query($mysqli, $sql);
                     while ($row = mysqli_fetch_array($query)) {
-                        $total_price += $row["giasp"] * $row["soluongmua"];
+                        $total_price += $row["price"] * $row["quantity_product"];
                 ?>
                     <tr>
                         <td><?php echo $i++; ?></td>
-                        <td><?php echo $row["ten_sanpham"]; ?></td>
-                        <td><img src="./quanlysanpham/uploads/<?php echo $row["hinhanh"]; ?>" class="img-fluid" width="150px" alt="Product Image"></td>
-                        <td><?php echo $row["soluongmua"]; ?></td>
-                        <td><?php echo number_format($row["giasp"], 0, ',', '.'); ?>đ</td>
-                        <td><?php echo number_format($row["giasp"] * $row["soluongmua"], 0, ',', '.'); ?>đ</td>
+                        <td><?php echo $row["name"]; ?></td>
+                        <td><img src="./quanlysanpham/uploads/<?php echo $row["image"]; ?>" class="img-fluid" width="150px" alt="Product Image"></td>
+                        <td><?php echo $row["quantity_product"]; ?></td>
+                        <td><?php echo number_format($row["price"], 0, ',', '.'); ?>đ</td>
+                        <td><?php echo number_format($row["price"] * $row["quantity_product"], 0, ',', '.'); ?>đ</td>
                     </tr>
                 <?php
                     }
