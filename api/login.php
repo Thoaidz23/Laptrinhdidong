@@ -1,5 +1,10 @@
 <?php
+
+
 include 'db.php'; // Kết nối cơ sở dữ liệu
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 
 // Thiết lập header để cho phép gọi từ Flutter hoặc frontend
 header("Content-Type: application/json; charset=UTF-8");

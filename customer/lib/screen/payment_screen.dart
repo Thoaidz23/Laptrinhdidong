@@ -38,10 +38,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   void initState() {
     super.initState();
+    bool _isLoading = false;
     final user = currentUser!;
     _nameController = TextEditingController(text: user.name);
     _phoneController = TextEditingController(text: user.phone);
     _addressController = TextEditingController(text: user.address);
+    _selectedMethod = "cod"; // hoặc để trống nếu bạn muốn bắt buộc người dùng chọn
+
   }
 
   @override
@@ -76,6 +79,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Future<void> _orderNow() async {
+
     if (_selectedMethod == null) {
       _showSnack("Vui lòng chọn phương thức thanh toán");
       return;
@@ -99,12 +103,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   Future<void> _handlePaypalPayment() async {
     final vndTotal = _getTotalVND();
-    final usdAmount = await _convertVNDToUSD(vndTotal);
+    final usdAmountRaw = await _convertVNDToUSD(vndTotal);
 
-    if (usdAmount == null) {
+    if (usdAmountRaw == null) {
       _showSnack("Lỗi chuyển đổi tiền tệ");
       return;
     }
+
+    final usdAmount = double.parse(usdAmountRaw.toStringAsFixed(2));
+
+
+
+
 
     Navigator.push(
       context,
@@ -129,7 +139,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
           "name_user": _nameController.text.trim(),
           "address": _addressController.text.trim(),
           "phone": _phoneController.text.trim(),
-          "method": _selectedMethod == "bank" ? 1 : 0,
+          "method": _selectedMethod == "bank"
+              ? 1
+              : _selectedMethod == "paypal"
+              ? 3
+              : 0,
           "cart": widget.cartItems.map((item) => {
             "id_product": item.idProduct,
             "quantity": item.quantity,
@@ -274,18 +288,27 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+
+                        // Email (không cho sửa)
+                        TextField(
+                          controller: TextEditingController(text: currentUser!.email),
+                          readOnly: true,
+                          decoration: const InputDecoration(
+                            labelText: 'Email',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
                         // Họ tên
                         TextField(
                           controller: _nameController,
-                          focusNode: _nameFocusNode,
-                          enabled: isEditingName,
+                          readOnly: !isEditingName,
                           decoration: InputDecoration(
-                            labelText: 'Họ tên',
+                            labelText: 'Họ và tên',
+                            border: const OutlineInputBorder(),
                             suffixIcon: IconButton(
-                              icon: Icon(
-                                isEditingName ? Icons.check : Icons.edit,
-                                color: Colors.grey,
-                              ),
+                              icon: Icon(isEditingName ? Icons.check : Icons.edit),
                               onPressed: () {
                                 setState(() => isEditingName = !isEditingName);
                                 if (isEditingName) {
@@ -295,28 +318,23 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 }
                               },
                             ),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Colors.orange, width: 2),
-                            ),
                           ),
+                          focusNode: _nameFocusNode,
                         ),
+
                         const SizedBox(height: 12),
 
                         // SĐT
                         TextField(
                           controller: _phoneController,
+                          readOnly: !isEditingPhone,
                           focusNode: _phoneFocusNode,
                           keyboardType: TextInputType.phone,
-                          enabled: isEditingPhone,
                           decoration: InputDecoration(
                             labelText: 'SĐT',
+                            border: const OutlineInputBorder(),
                             suffixIcon: IconButton(
-                              icon: Icon(
-                                isEditingPhone ? Icons.check : Icons.edit,
-                                color: Colors.grey,
-                              ),
+                              icon: Icon(isEditingPhone ? Icons.check : Icons.edit),
                               onPressed: () {
                                 setState(() => isEditingPhone = !isEditingPhone);
                                 if (isEditingPhone) {
@@ -326,27 +344,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 }
                               },
                             ),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Colors.orange, width: 2),
-                            ),
                           ),
                         ),
+
                         const SizedBox(height: 12),
 
                         // Địa chỉ
                         TextField(
                           controller: _addressController,
+                          readOnly: !isEditingAddress,
                           focusNode: _addressFocusNode,
-                          enabled: isEditingAddress,
                           decoration: InputDecoration(
                             labelText: 'Địa chỉ',
+                            border: const OutlineInputBorder(),
                             suffixIcon: IconButton(
-                              icon: Icon(
-                                isEditingAddress ? Icons.check : Icons.edit,
-                                color: Colors.grey,
-                              ),
+                              icon: Icon(isEditingAddress ? Icons.check : Icons.edit),
                               onPressed: () {
                                 setState(() => isEditingAddress = !isEditingAddress);
                                 if (isEditingAddress) {
@@ -356,13 +368,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 }
                               },
                             ),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Colors.orange, width: 2),
-                            ),
                           ),
                         ),
+
                       ],
                     ),
                   ),
@@ -374,11 +382,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       children: [
                         buildMethodButton("cod", Icons.money, "Thanh toán khi nhận hàng"),
                         const SizedBox(height: 8),
-                        buildMethodButton("momo", Icons.phone_android, "Thanh toán MoMo"),
-                        const SizedBox(height: 8),
+                        // buildMethodButton("momo", Icons.phone_android, "Thanh toán MoMo"),
+                        // const SizedBox(height: 8),
                         buildMethodButton("paypal", Icons.payment, "Thanh toán bằng PayPal"),
-                        const SizedBox(height: 8),
-                        buildMethodButton("bank", Icons.account_balance, "Chuyển khoản ngân hàng"),
+                        // const SizedBox(height: 8),
+                        // buildMethodButton("bank", Icons.account_balance, "Chuyển khoản ngân hàng"),
                       ],
                     ),
                   ),
@@ -392,6 +400,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
+
                 onPressed: _orderNow,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,

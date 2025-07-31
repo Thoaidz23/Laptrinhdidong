@@ -1,8 +1,17 @@
 <?php
 include 'db.php';
 
-$id_user = $_GET['id_user'];
-$sql = "SELECT c.*, p.name, p.image, p.price FROM tbl_cart c
+header('Content-Type: application/json'); // ✅ THÊM DÒNG NÀY
+
+$id_user = $_GET['id_user'] ?? null;
+
+if (!$id_user) {
+    echo json_encode(["status" => false, "message" => "Thiếu id_user"]);
+    exit;
+}
+
+$sql = "SELECT c.*, p.name, p.image, p.price, p.quantity as maxQuantity
+        FROM tbl_cart c
         JOIN tbl_product p ON c.id_product = p.id_product
         WHERE c.id_user = ?";
 $stmt = $conn->prepare($sql);
@@ -16,3 +25,4 @@ while ($row = $result->fetch_assoc()) {
 }
 
 echo json_encode($cart);
+?>

@@ -215,7 +215,6 @@ class _AccountPageState extends State<AccountPage> {
                         const SizedBox(height: 12),
 
                         // Form thông tin người dùng
-                        // Form thông tin người dùng
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(

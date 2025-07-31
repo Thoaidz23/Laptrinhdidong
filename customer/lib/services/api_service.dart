@@ -19,7 +19,6 @@ class ApiService {
           final data = jsonDecode(response.body);
           String ip = data['ip'];
           baseUrl = "http://$ip/ttsfood/api";
-          print(">>> New baseUrl: $baseUrl");
 
         }
       } catch (e) {
@@ -34,7 +33,6 @@ class ApiService {
             : "$baseUrl/get_products.php";
 
         final response = await http.get(Uri.parse(url));
-        print(">>> Product API response: ${response.body}");
 
         if (response.statusCode == 200) {
           final List data = json.decode(response.body);
@@ -395,15 +393,12 @@ class ApiService {
         return;
       }
 
-      print("💵 USD Amount to send: $usdAmount");
 
       final response = await http.post(
         Uri.parse("http://10.0.2.2/ttsfood/api/create-payment.php"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"amount": usdAmount}),
       );
-
-      print("📦 Response: ${response.body}");
 
       final data = jsonDecode(response.body);
 

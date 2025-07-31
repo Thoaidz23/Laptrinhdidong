@@ -18,10 +18,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   http: ^1.4.0
   provider: ^6.1.1
-
+  url_launcher: ^6.2.5
   flutter_html: ^3.0.0-beta.2   # ← Thêm gói xử lý HTML ở đây
-
-
   font_awesome_flutter: ^10.7.0 # ← thêm dòng này
   html: ^0.15.6
   webview_flutter: ^4.2.2

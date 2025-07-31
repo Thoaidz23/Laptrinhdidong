@@ -1,23 +1,25 @@
 import '../services/api_service.dart';
+
 class CartItem {
   final int idCart;
   final int idUser;
   final int idProduct;
   final int quantity;
+  final int maxQuantity;
   final double price;
   final String name;
   final String image;
-  final int availableQuantity; // 👈 Thêm dòng này
 
   CartItem({
     required this.idCart,
     required this.idUser,
     required this.idProduct,
     required this.quantity,
+    required this.maxQuantity,
     required this.price,
     required this.name,
     required this.image,
-    required this.availableQuantity, // 👈 Thêm vào constructor
+
   });
 
   factory CartItem.fromJson(Map<String, dynamic> json) {
@@ -26,10 +28,11 @@ class CartItem {
       idUser: int.parse(json['id_user'].toString()),
       idProduct: int.parse(json['id_product'].toString()),
       quantity: int.parse(json['quantity'].toString()),
+      maxQuantity: int.parse(json['maxQuantity'].toString()),
       price: double.parse(json['price'].toString()),
       name: json['name'],
       image: json['image'],
-      availableQuantity: int.parse(json['available_quantity'].toString()), // 👈 lấy từ API
+
     );
   }
 

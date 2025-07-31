@@ -411,8 +411,8 @@
                       quantity: _quantity,
                       price: widget.product.price,
                       name: widget.product.name,
-                      image: widget.product.image, // hoặc widget.product.imageUrl gốc nếu khác
-                        availableQuantity: widget.product.quantity,
+                      image: widget.product.image,
+                      maxQuantity: widget.product.quantity,
                     );
 
                     Navigator.push(

@@ -9,6 +9,7 @@ $name_user = $data['name_user'];
 $address = $data['address'];
 $phone = $data['phone'];
 $method = (int)$data['method']; // 0 = COD, 1 = bank transfer
+$paystatus = ($method == 1 || $method == 3) ? 1 : 0;
 $cart = $data['cart'];
 $isBuyNow = isset($data['isBuyNow']) ? $data['isBuyNow'] : false;
 
@@ -22,7 +23,15 @@ foreach ($cart as $item) {
 $status = 0;
 
 // paystatus: nếu là ngân hàng (method = 1) => đã thanh toán (1), COD => chưa thanh toán (0)
-$paystatus = ($method == 1) ? 1 : 0;
+switch ($method) {
+    case 1: // Bank
+    case 3: // PayPal
+    case 4: // MoMo (nếu áp dụng)
+        $paystatus = 1;
+        break;
+    default: // COD hoặc các phương thức chưa thanh toán
+        $paystatus = 0;
+}
 
 $date = date('Y-m-d H:i:s');
 

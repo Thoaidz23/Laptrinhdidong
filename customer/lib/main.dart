@@ -20,8 +20,6 @@ User? currentUser;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ApiService.fetchBaseUrl();
-
-
   runApp(const MyApp());
 }
 

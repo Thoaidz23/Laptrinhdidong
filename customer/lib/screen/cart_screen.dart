@@ -122,8 +122,22 @@ class _CartScreenState extends State<CartScreen> {
                                   children: [
                                     const Text("Số lượng: "),
                                     IconButton(
+                                      icon: const Icon(Icons.remove),
+                                      onPressed: item.quantity > 1
+                                          ? () async {
+                                        await ApiService.updateCart(
+                                          currentUser!.id,
+                                          item.idProduct,
+                                          item.quantity - 1,
+                                        );
+                                        await _loadCart();
+                                      }
+                                          : null, // disable nếu = 1
+                                    ),
+                                    Text('${item.quantity}', style: const TextStyle(fontSize: 16)),
+                                    IconButton(
                                       icon: const Icon(Icons.add),
-                                      onPressed: item.quantity < item.availableQuantity && item.quantity < 50
+                                      onPressed: item.quantity < 50 && item.quantity < item.maxQuantity
                                           ? () async {
                                         await ApiService.updateCart(
                                           currentUser!.id,
@@ -132,24 +146,10 @@ class _CartScreenState extends State<CartScreen> {
                                         );
                                         await _loadCart();
                                       }
-                                          : () {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text('Chỉ có thể mua tối đa ${item.availableQuantity > 50 ? 50 : item.availableQuantity} sản phẩm.')),
-                                        );
-                                      },
-                                    ),
-                                    Text('${item.quantity}', style: const TextStyle(fontSize: 16)),
-                                    IconButton(
-                                      icon: const Icon(Icons.add),
-                                      onPressed: () async {
-                                        await ApiService.updateCart(
-                                            currentUser!.id, item.idProduct, item.quantity + 1);
-                                        await _loadCart();
-                                      },
+                                          : null, // disable nếu đạt giới hạn
                                     ),
                                   ],
                                 ),
-
                                 Text(
                                   "Giá: ${NumberFormat('#,###', 'vi_VN').format(item.price)} đ",
                                 ),
