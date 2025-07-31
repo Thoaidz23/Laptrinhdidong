@@ -1,7 +1,7 @@
 <?php
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
-require 'db.php';
+require 'config.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 $order_id = $data['order_id'] ?? '';

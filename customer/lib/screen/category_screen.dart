@@ -212,7 +212,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                     ? html_parser.parse(p.content).documentElement?.text ?? ''
                                     : '',
                                 style: const TextStyle(fontSize: 13),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
+
                               const SizedBox(height: 4),
                               Text(
                                 'Giá: ${NumberFormat('#,###', 'vi_VN').format(p.price)} đ',

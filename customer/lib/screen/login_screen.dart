@@ -85,37 +85,45 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       final body = utf8.decode(response.bodyBytes);
-      if (response.statusCode == 200 && body.startsWith('{')) {
-        final data = jsonDecode(body);
+      print('Response: $body');
+      print('Status code: ${response.statusCode}');
 
-        if (data['status'] == false) {
-          _showMessage(data['message']);
-          return;
+      if (response.statusCode == 200) {
+        try {
+          final data = jsonDecode(body);
+          print("Parsed JSON: $data");
+
+          if (data['status'] == false) {
+            _showMessage(data['message']);
+            return;
+          }
+
+          final user = User.fromJson(data['user']);
+          if (user.lock_account == 1) {
+            _showMessage("Tài khoản của bạn đã bị khóa. Vui lòng sử dụng chức năng Quên mật khẩu để mở lại.");
+            return;
+          }
+
+          currentUser = user;
+          print('✅ Current user: ${currentUser?.name}');
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => MainScreen(initialIndex: 0)),
+          );
+        } catch (e) {
+          print('❌ JSON parse error: $e');
+          setState(() => _loginError = 'Phản hồi từ server không hợp lệ');
         }
-
-        final user = User.fromJson(data['user']);
-
-        // Kiểm tra tài khoản bị khóa từ phía Flutter
-        if (user.lock_account == 1) {
-          _showMessage("Tài khoản của bạn đã bị khóa. Vui lòng sử dụng chức năng Quên mật khẩu để mở lại.");
-          return;
-        }
-
-// ✅ Lưu người dùng hiện tại
-        currentUser = user;
-
-// ✅ Đăng nhập thành công → điều hướng
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => MainScreen(initialIndex: 0)),
-        );
       } else {
         setState(() => _loginError = 'Lỗi phản hồi từ máy chủ');
       }
     } catch (e) {
       setState(() => _loginError = 'Không thể kết nối tới server');
+      print('❌ Network error: $e');
     }
   }
+
 
 
 
@@ -259,6 +267,7 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() => _selectedIndex = index);
 
           if (index == 0 || index == 1 || index == 4) {
+            print("Navigating to MainScreen...");
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => MainScreen(initialIndex: index)),

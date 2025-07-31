@@ -1,16 +1,12 @@
 <?php
+include 'db.php'; // kết nối CSDL
 
-
-include 'db.php'; // Kết nối cơ sở dữ liệu
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-
-// Thiết lập header để cho phép gọi từ Flutter hoặc frontend
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Origin: *");
 
-// Nhận dữ liệu từ Flutter gửi lên (JSON)
 $data = json_decode(file_get_contents("php://input"));
 
 $email = $data->email ?? '';
@@ -25,7 +21,7 @@ if (empty($email) || empty($password)) {
     exit;
 }
 
-// Truy vấn CSDL để kiểm tra đăng nhập
+// Truy vấn
 $sql = "SELECT * FROM tbl_user WHERE email = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $email);
@@ -35,7 +31,6 @@ $result = $stmt->get_result();
 if ($result->num_rows > 0) {
     $user = $result->fetch_assoc();
 
-    // ✅ Kiểm tra nếu tài khoản bị khóa
     if ((int)$user['lock_account'] === 1) {
         echo json_encode([
             'status' => false,
@@ -44,7 +39,6 @@ if ($result->num_rows > 0) {
         exit;
     }
 
-    // ✅ Kiểm tra mật khẩu
     if (password_verify($password, $user['password'])) {
         echo json_encode([
             'status' => true,
@@ -55,7 +49,7 @@ if ($result->num_rows > 0) {
                 'email' => $user['email'],
                 'phone' => $user['phone'],
                 'address' => $user['address'],
-                'lock_account' => (int)$user['lock_account'], // <-- Truyền về luôn cho Flutter dùng
+                'lock_account' => (int)$user['lock_account'],
             ]
         ]);
     } else {

@@ -3,7 +3,7 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 
-require 'db.php'; // PAYPAL_CLIENT_ID, PAYPAL_SECRET
+require 'config.php'; // PAYPAL_CLIENT_ID, PAYPAL_SECRET
 
 $data = json_decode(file_get_contents("php://input"), true);
 $amount_usd = $data['amount_usd'] ?? 0;
